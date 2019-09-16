@@ -73,6 +73,14 @@ class CSVDataTable(BaseDataTable):
             self._rows = []
         self._rows.append(r)
 
+    def _delete_row(self, r_idx):
+        if self._rows is not None:
+            del self._rows[r_idx]
+
+    def _delete_rows(self, r_idx_list):
+        for idx in r_idx_list:
+            self._delete_row(idx)
+
     def _load(self):
 
         dir_info = self._data["connect_info"].get("directory")
@@ -112,7 +120,28 @@ class CSVDataTable(BaseDataTable):
         :return: None, or a dictionary containing the requested fields for the record identified
             by the key.
         """
-        pass
+
+        # Build a template which contains key columns and their value
+        template = {}
+        for i in range(0, len(self._data['key_columns'])):
+            template[self._data['key_columns'][i]] = key_fields[i]
+
+        # Iterate each row in data and return matching row as dict if any
+        for row in self.get_rows():
+            if CSVDataTable.matches_template(row, template):
+                # What if field_list is empty? I assume returning empty dict will be suitable because
+                # it differs from returning None and indicates that there is actually matching row
+                if field_list is None:
+                    return {}
+
+                # If not, copy needed fields from the row to return variable
+                needed_fields = {}
+                for key in field_list:
+                    needed_fields[key] = row.get(key)
+                return needed_fields
+
+        # No matching row
+        return None
 
     def find_by_template(self, template, field_list=None, limit=None, offset=None, order_by=None):
         """
@@ -125,7 +154,27 @@ class CSVDataTable(BaseDataTable):
         :return: A list containing dictionaries. A dictionary is in the list representing each record
             that matches the template. The dictionary only contains the requested fields.
         """
-        pass
+
+        # Iterate each row in data and add matching rows to a list
+        matching_rows = []
+        for row in self.get_rows():
+            if CSVDataTable.matches_template(row, template):
+                # What if field_list is empty? I assume appending empty dict will be suitable because
+                # it can indicate how many rows match the template
+                if field_list is None:
+                    matching_rows.append({})
+                else:
+                    # If not, copy needed fields from the row to return variable
+                    needed_fields = {}
+                    for key in field_list:
+                        needed_fields[key] = row.get(key)
+                    matching_rows.append(needed_fields)
+
+        if len(matching_rows) > 0:
+            # Will be used later to handle limit, offset and order_by
+            pass
+
+        return matching_rows
 
     def delete_by_key(self, key_fields):
         """
@@ -173,3 +222,33 @@ class CSVDataTable(BaseDataTable):
     def get_rows(self):
         return self._rows
 
+if __name__=='__main__':
+    data_dir = os.path.abspath("../Data/Baseball")
+
+    connect_info = {
+        "directory": data_dir,
+        "file_name": "People.csv"
+    }
+
+    csv_data_tbl = CSVDataTable("people", connect_info, ["playerID"])
+    # print("Created table = " + str(csv_data_tbl))
+
+    # Unit test for find_by_primary_key
+    # print(csv_data_tbl.find_by_primary_key(["aardsda01"], ["birthYear", "birthMonth"]))
+    # print(csv_data_tbl.find_by_primary_key(["aardsda01"]))
+    # print(csv_data_tbl.find_by_primary_key(["aardsda07"]))
+
+    # Unit test for find_by_template
+    # print(csv_data_tbl.find_by_template({"birthYear": "1985"}, ["birthYear", "birthMonth"]))
+    # print(csv_data_tbl.find_by_template({"birthYear": "1985", "birthMonth": "5"}, ["birthYear", "birthMonth"]))
+    # print(len(csv_data_tbl.find_by_template({"birthYear": "1985"}, ["birthYear", "birthMonth"])))
+    # print(csv_data_tbl.find_by_template({"birthYear": "1985"}))
+    # print(len(csv_data_tbl.find_by_template({"birthYear": "1985"})))
+    # print(csv_data_tbl.find_by_template({"birthYear": "1585"}, ["birthYear", "birthMonth"]))
+
+    # List of questions for TA
+    # 1. How to construct unit test -> Any specified format
+    # https://piazza.com/class/jy3jm0i73f8584?cid=71
+    # 2. Do we treat each column differently or can it be just text for all?
+    # 3. For delete_by_key why do we need to return count of rows deleted? Should that always be one?
+    # Assuming no two rows have the same set of primary keys
