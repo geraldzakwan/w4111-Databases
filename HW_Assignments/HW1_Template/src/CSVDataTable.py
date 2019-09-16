@@ -73,12 +73,12 @@ class CSVDataTable(BaseDataTable):
             self._rows = []
         self._rows.append(r)
 
-    def _delete_row(self, r_idx):
+    def _delete_row(self, r_indexes):
         if self._rows is not None:
-            del self._rows[r_idx]
+            del self._rows[r_indexes]
 
-    def _delete_rows(self, r_idx_list):
-        for idx in r_idx_list:
+    def _delete_rows(self, r_indexes_list):
+        for idx in sorted(r_indexes_list, reverse=True):
             self._delete_row(idx)
 
     def _load(self):
@@ -184,7 +184,23 @@ class CSVDataTable(BaseDataTable):
         :param template: A template.
         :return: A count of the rows deleted.
         """
-        pass
+        # Build a template which contains key columns and their value
+        template = {}
+        for i in range(0, len(self._data['key_columns'])):
+            template[self._data['key_columns'][i]] = key_fields[i]
+
+        # Iterate each row in data and add the row's index if key matches
+        rows = self.get_rows()
+        indexes_to_delete = []
+        for i in range(0, len(rows)):
+            if CSVDataTable.matches_template(rows[i], template):
+                indexes_to_delete.append(i)
+
+        # Delete all rows
+        self._delete_rows(indexes_to_delete)
+
+        # Return number of rows deleted
+        return len(indexes_to_delete)
 
     def delete_by_template(self, template):
         """
@@ -192,7 +208,18 @@ class CSVDataTable(BaseDataTable):
         :param template: Template to determine rows to delete.
         :return: Number of rows deleted.
         """
-        pass
+        # Iterate each row in data and add the row's index if key matches
+        rows = self.get_rows()
+        indexes_to_delete = []
+        for i in range(0, len(rows)):
+            if CSVDataTable.matches_template(rows[i], template):
+                indexes_to_delete.append(i)
+
+        # Delete all rows
+        self._delete_rows(indexes_to_delete)
+
+        # Return number of rows deleted
+        return len(indexes_to_delete)
 
     def update_by_key(self, key_fields, new_values):
         """
@@ -245,6 +272,19 @@ if __name__=='__main__':
     # print(csv_data_tbl.find_by_template({"birthYear": "1985"}))
     # print(len(csv_data_tbl.find_by_template({"birthYear": "1985"})))
     # print(csv_data_tbl.find_by_template({"birthYear": "1585"}, ["birthYear", "birthMonth"]))
+
+    # Unit test for delete_by_key
+    # print(csv_data_tbl.delete_by_key(["aardsda01"]))
+    # print(csv_data_tbl.delete_by_key(["aardsda01"]))
+    # print(csv_data_tbl.delete_by_key(["aardsda07"]))
+
+    # Unit test for delete_by_key
+    # print(csv_data_tbl.delete_by_template({"birthYear": "1585"}))
+    # print(csv_data_tbl.delete_by_template({"birthYear": "1985", "birthMonth": "0"}))
+    # print(len(csv_data_tbl.find_by_template({"birthYear": "1985"})))
+    # print(csv_data_tbl.delete_by_template({"birthYear": "1985", "birthMonth": "5"}))
+    # print(csv_data_tbl.delete_by_template({"birthYear": "1985"}))
+
 
     # List of questions for TA
     # 1. How to construct unit test -> Any specified format
