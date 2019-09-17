@@ -154,11 +154,15 @@ class CSVDataTable(BaseDataTable):
         """
 
         # Directly return if param is None or empty
-        if key_fields is None or field_list is None:
-            return 0
+        if key_fields is None:
+            return self.get_rows()
 
-        if len(key_fields) == 0 or len(field_list) == 0:
-            return 0
+        if len(key_fields) == 0:
+            return self.get_rows()
+
+        # Directly return if no primary key is set
+        if self._data['key_columns'] is None or len(self._data['key_columns']) == 0:
+            return None
 
         template = self.convert_to_template(key_fields)
         # Iterate each row in data and return matching row as dict if any
@@ -166,7 +170,7 @@ class CSVDataTable(BaseDataTable):
             if CSVDataTable.matches_template(row, template):
                 # What if field_list is empty? I assume returning empty dict will be suitable because
                 # it differs from returning None and indicates that there is actually matching row
-                if field_list is None:
+                if field_list is None or len(field_list) == 0:
                     return {}
 
                 # If not, copy needed fields from the row to return variable
@@ -191,11 +195,11 @@ class CSVDataTable(BaseDataTable):
         """
 
         # Directly return if param is None or empty
-        if template is None or field_list is None:
-            return 0
+        if template is None:
+            return self.get_rows()
 
-        if len(template) == 0 or len(field_list) == 0:
-            return 0
+        if len(template) == 0:
+            return self.get_rows()
 
         # Iterate each row in data and add matching rows to a list
         matching_rows = []
@@ -203,7 +207,7 @@ class CSVDataTable(BaseDataTable):
             if CSVDataTable.matches_template(row, template):
                 # What if field_list is empty? I assume appending empty dict will be suitable because
                 # it can indicate how many rows match the template
-                if field_list is None:
+                if field_list is None or len(field_list) == 0:
                     matching_rows.append({})
                 else:
                     # If not, copy needed fields from the row to return variable
@@ -234,6 +238,10 @@ class CSVDataTable(BaseDataTable):
         if len(key_fields) == 0:
             return 0
 
+        # Directly return if no primary key is set
+        if self._data['key_columns'] is None or len(self._data['key_columns']) == 0:
+            return 0
+
         template = self.convert_to_template(key_fields)
         # Iterate each row in data and add the row's index if key matches
         rows = self.get_rows()
@@ -262,7 +270,7 @@ class CSVDataTable(BaseDataTable):
 
         # Iterate each row in data and add the row's index if key matches
         rows = self.get_rows()
-        r_indexes_= []
+        r_indexes = []
         for i in range(0, len(rows)):
             if CSVDataTable.matches_template(rows[i], template):
                 r_indexes.append(i)
@@ -291,6 +299,10 @@ class CSVDataTable(BaseDataTable):
             return 0
 
         if len(key_fields) == 0 or len(new_values) == 0:
+            return 0
+
+        # Directly return if no primary key is set
+        if self._data['key_columns'] is None or len(self._data['key_columns']) == 0:
             return 0
 
         template = self.convert_to_template(key_fields)
@@ -401,12 +413,13 @@ if __name__=='__main__':
     # csv_data_tbl.save("People_test.csv")
 
     # List of questions for TA
-    # 1. How to construct unit test -> Any specified format
+    # - How to construct unit test -> Any specified format
     # https://piazza.com/class/jy3jm0i73f8584?cid=71
-    # 2. Do we treat each column differently or can it be just text for all?
-    # 3. For delete_by_key and update_by_key why do we need to return count of rows deleted? Should that always be one?
+    # - Do we treat each column differently or can it be just text for all?
+    # - For delete_by_key and update_by_key why do we need to return count of rows deleted? Should that always be one?
     # Assuming no two rows have the same set of primary keys
-    # 4. Confusion for by_key methods, do we accept list of key values or template?
-    # 5. If needed_field is None, what should I return?
-    # 6. Corner cases? e.g. value is None or template is empty
-    # 7. The difference between insert and add_row, add_row is already implemented
+    # - Confusion for by_key methods, do we accept list of key values or template?
+    # - If needed_field is None, what should I return?
+    # - Corner cases? e.g. value is None or template is empty
+    # - The difference between insert and add_row, add_row is already implemented
+    # - Which database should I use to create test unit? Should I cover all cases?
