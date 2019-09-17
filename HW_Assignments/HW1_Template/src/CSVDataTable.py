@@ -351,7 +351,12 @@ class CSVDataTable(BaseDataTable):
         :param new_record: A dictionary representing a row to add to the set of records.
         :return: None
         """
-        pass
+
+        # Directly return if param is None or empty
+        if new_record is None or len(new_record) == 0:
+            return
+
+        self._add_row(new_record)
 
     def get_rows(self):
         return self._rows
@@ -404,3 +409,4 @@ if __name__=='__main__':
     # 4. Confusion for by_key methods, do we accept list of key values or template?
     # 5. If needed_field is None, what should I return?
     # 6. Corner cases? e.g. value is None or template is empty
+    # 7. The difference between insert and add_row, add_row is already implemented
