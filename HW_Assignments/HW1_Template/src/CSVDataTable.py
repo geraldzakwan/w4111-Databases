@@ -100,6 +100,22 @@ class CSVDataTable(BaseDataTable):
         :return: None
         """
 
+        # Construct filepath from connect_info
+        dir_info = self._data["connect_info"].get("directory")
+        file_n = self._data["connect_info"].get("file_name")
+        full_name = os.path.join(dir_info, file_n)
+
+        # Try-except block to catch any error and print it if any
+        try:
+            with open(full_name, "w") as txt_file:
+                # Use csv.DictWriter to write to csv, fieldnames are fetched from the first row keys
+                csv_d_wrtr = csv.DictWriter(txt_file, fieldnames=list(self.get_rows()[0].keys()))
+                csv_d_wrtr.writeheader()
+                for data in self.get_rows():
+                    csv_d_wrtr.writerow(data)
+        except IOError:
+            self._logger.error(IOError)
+
     @staticmethod
     def matches_template(row, template):
 
@@ -285,6 +301,8 @@ if __name__=='__main__':
     # print(csv_data_tbl.delete_by_template({"birthYear": "1985", "birthMonth": "5"}))
     # print(csv_data_tbl.delete_by_template({"birthYear": "1985"}))
 
+    # Unit test for save
+    # csv_data_tbl.save("People_test.csv")
 
     # List of questions for TA
     # 1. How to construct unit test -> Any specified format
