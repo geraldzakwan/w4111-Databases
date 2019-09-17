@@ -73,13 +73,21 @@ class CSVDataTable(BaseDataTable):
             self._rows = []
         self._rows.append(r)
 
-    def _delete_row(self, r_indexes):
+    def _delete_row(self, r_idx):
         if self._rows is not None:
-            del self._rows[r_indexes]
+            del self._rows[r_idx]
 
-    def _delete_rows(self, r_indexes_list):
-        for idx in sorted(r_indexes_list, reverse=True):
+    def _delete_rows(self, r_indexes):
+        for idx in sorted(r_indexes, reverse=True):
             self._delete_row(idx)
+
+    def modify_row(self, idx, new_values):
+        for key in new_values:
+            self._rows[idx][key] = new_values[key]
+
+    def modify_rows(self, r_indexes, new_values):
+        for idx in idx_to_delete:
+            self.modify_rows(r_indexes, new_values)
 
     def _load(self):
 
@@ -128,6 +136,14 @@ class CSVDataTable(BaseDataTable):
 
         return result
 
+    # Build a template which contains key columns and their value
+    def convert_to_template(self, key_fields):
+        template = {}
+        for i in range(0, len(self._data['key_columns'])):
+            template[self._data['key_columns'][i]] = key_fields[i]
+
+        return template
+
     def find_by_primary_key(self, key_fields, field_list=None):
         """
 
@@ -137,11 +153,14 @@ class CSVDataTable(BaseDataTable):
             by the key.
         """
 
-        # Build a template which contains key columns and their value
-        template = {}
-        for i in range(0, len(self._data['key_columns'])):
-            template[self._data['key_columns'][i]] = key_fields[i]
+        # Directly return if param is None or empty
+        if key_fields is None or field_list is None:
+            return 0
 
+        if len(key_fields) == 0 or len(field_list) == 0:
+            return 0
+
+        template = self.convert_to_template(key_fields)
         # Iterate each row in data and return matching row as dict if any
         for row in self.get_rows():
             if CSVDataTable.matches_template(row, template):
@@ -170,6 +189,13 @@ class CSVDataTable(BaseDataTable):
         :return: A list containing dictionaries. A dictionary is in the list representing each record
             that matches the template. The dictionary only contains the requested fields.
         """
+
+        # Directly return if param is None or empty
+        if template is None or field_list is None:
+            return 0
+
+        if len(template) == 0 or len(field_list) == 0:
+            return 0
 
         # Iterate each row in data and add matching rows to a list
         matching_rows = []
@@ -200,23 +226,25 @@ class CSVDataTable(BaseDataTable):
         :param template: A template.
         :return: A count of the rows deleted.
         """
-        # Build a template which contains key columns and their value
-        template = {}
-        for i in range(0, len(self._data['key_columns'])):
-            template[self._data['key_columns'][i]] = key_fields[i]
 
+        # Directly return if param is None or empty
+        if key_fields is None:
+            return 0
+
+        if len(key_fields) == 0:
+            return 0
+
+        template = self.convert_to_template(key_fields)
         # Iterate each row in data and add the row's index if key matches
         rows = self.get_rows()
-        indexes_to_delete = []
         for i in range(0, len(rows)):
             if CSVDataTable.matches_template(rows[i], template):
-                indexes_to_delete.append(i)
+                self._delete_row(i)
+                # If we can assume there is no duplicate, we can return 1
+                return 1
 
-        # Delete all rows
-        self._delete_rows(indexes_to_delete)
-
-        # Return number of rows deleted
-        return len(indexes_to_delete)
+        # No matching row
+        return 0
 
     def delete_by_template(self, template):
         """
@@ -224,18 +252,31 @@ class CSVDataTable(BaseDataTable):
         :param template: Template to determine rows to delete.
         :return: Number of rows deleted.
         """
+
+        # Directly return if param is None or empty
+        if template is None:
+            return 0
+
+        if len(template) == 0:
+            return 0
+
         # Iterate each row in data and add the row's index if key matches
         rows = self.get_rows()
-        indexes_to_delete = []
+        r_indexes_= []
         for i in range(0, len(rows)):
             if CSVDataTable.matches_template(rows[i], template):
-                indexes_to_delete.append(i)
+                r_indexes.append(i)
 
-        # Delete all rows
-        self._delete_rows(indexes_to_delete)
-
-        # Return number of rows deleted
-        return len(indexes_to_delete)
+        # Use either _delete_row or _delete_rows function
+        # and return appropriate value
+        if len(r_indexes) == 0:
+            return 0
+        elif len(r_indexes) == 1:
+            self._delete_row(r_indexes[0])
+            return 1
+        else:
+            self._delete_rows(r_indexes)
+            return len(r_indexes)
 
     def update_by_key(self, key_fields, new_values):
         """
@@ -245,6 +286,30 @@ class CSVDataTable(BaseDataTable):
         :return: Number of rows updated.
         """
 
+        # Directly return if param is None or empty
+        if key_fields is None or new_values is None:
+            return 0
+
+        if len(key_fields) == 0 or len(new_values) == 0:
+            return 0
+
+        template = self.convert_to_template(key_fields)
+        idx = -1
+        i = 0
+        # Iterate each row in data and update matching row if any
+        for row in self.get_rows():
+            if CSVDataTable.matches_template(row, template):
+                idx = i
+                break
+            i = i + 1
+
+        if idx == -1:
+            # No matching row
+            return 0
+        else:
+            self.modify_row(idx, new_values)
+            return 1
+
     def update_by_template(self, template, new_values):
         """
 
@@ -252,7 +317,33 @@ class CSVDataTable(BaseDataTable):
         :param new_values: New values to set for matching fields.
         :return: Number of rows updated.
         """
-        pass
+
+        # Directly return if param is None or empty
+        if template is None or new_values is None:
+            return 0
+
+        if len(template) == 0 or len(new_values) == 0:
+            return 0
+
+        template = self.convert_to_template(key_fields)
+        r_indexes = []
+        i = 0
+        # Iterate each row in data and update matching row if any
+        for row in self.get_rows():
+            if CSVDataTable.matches_template(row, template):
+                r_indexes.append(i)
+            i = i + 1
+
+        # Use either _modify_row or _modify_rows function
+        # and return appropriate value
+        if len(r_indexes) == 0:
+            return 0
+        elif len(r_indexes) == 1:
+            self.modify_row(r_indexes[0], new_values)
+            return 1
+        else:
+            self.modify_rows(r_indexes, new_values)
+            return len(r_indexes)
 
     def insert(self, new_record):
         """
@@ -308,5 +399,8 @@ if __name__=='__main__':
     # 1. How to construct unit test -> Any specified format
     # https://piazza.com/class/jy3jm0i73f8584?cid=71
     # 2. Do we treat each column differently or can it be just text for all?
-    # 3. For delete_by_key why do we need to return count of rows deleted? Should that always be one?
+    # 3. For delete_by_key and update_by_key why do we need to return count of rows deleted? Should that always be one?
     # Assuming no two rows have the same set of primary keys
+    # 4. Confusion for by_key methods, do we accept list of key values or template?
+    # 5. If needed_field is None, what should I return?
+    # 6. Corner cases? e.g. value is None or template is empty
