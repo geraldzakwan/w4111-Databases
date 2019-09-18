@@ -1,1 +1,14 @@
 /HW_Solutions
+.DS_Store
+.idea/w4111-Databases.iml
+.idea/workspace.xml
+HW_Assignments/HW1_Template/.idea/misc.xml
+HW_Assignments/HW1_Template/.idea/workspace.xml
+HW_Assignments/HW1_Template/.idea/misc.xml
+HW_Assignments/HW1_Template/.idea/workspace.xml
+HW_Assignments/HW1_Template/.coverage
+HW_Assignments/HW1_Template/Data/Baseball/People_test.csv
+HW_Assignments/HW1_Template/src/__pycache__/
+HW_Assignments/HW1_Template/tests/__pycache__/
+HW_Assignments/__pycache__/
+venv/

@@ -36,6 +36,12 @@ class RDBDataTable(BaseDataTable):
         # e.g. ALTER TABLE `appearances` MODIFY COLUMN `playerID` VARCHAR (9) NOT NULL; -> max for playerID is 9
         # e.g. ALTER TABLE `appearances` MODIFY COLUMN `teamID` VARCHAR (3) NOT NULL; -> all teamID is of length 3
         # e.g. ALTER TABLE `appearances` MODIFY COLUMN `yearID` VARCHAR (4) NOT NULL; -> all yearID is of length 4
+        if self._data["key_columns"] is None:
+            return
+
+        if len(self._data["key_columns"]) == 0:
+            return
+
         with self._db_client.cursor() as cursor:
             primary_key_string = self.compose_field_list_string(self._data["key_columns"])
             # Q How if there is already a primary key? -> drop first
@@ -93,6 +99,12 @@ class RDBDataTable(BaseDataTable):
             by the key.
         """
 
+        if self._data["key_columns"] is None:
+            return None
+
+        if len(self._data["key_columns"]) == 0:
+            return None
+
         if key_fields is None:
             return None
         if len(key_fields) == 0:
@@ -149,25 +161,29 @@ class RDBDataTable(BaseDataTable):
         :param template: A template.
         :return: A count of the rows deleted.
         """
+
+        if self._data["key_columns"] is None:
+            return 0
+
+        if len(self._data["key_columns"]) == 0:
+            return 0
+
         if key_fields is None:
-            return None
+            return 0
 
         if len(key_fields) == 0:
-            return {}
+            return 0
 
         keys_string = self.compose_keys_string(key_fields)
         rows_returned = 0
-        try:
-            with self._db_client.cursor() as cursor:
-                query = "DELETE " + "FROM " + "`" + self._data["table_name"] + "`" + "WHERE " + keys_string
-                if cursor.rowcount > 0:
-                    # commit
-                    rows_returned = cursor.rowcount
-        finally:
-            # This will always close client connection
-            # If anything fails, it will always return 0
-            self._db_client.close()
-            return rows_returned
+
+        with self._db_client.cursor() as cursor:
+            query = "DELETE " + "FROM " + "`" + self._data["table_name"] + "`" + "WHERE " + keys_string
+            if cursor.rowcount == 1:
+                # commit
+                rows_returned = 1
+
+        return rows_returned
 
     def delete_by_template(self, template):
         """
@@ -176,25 +192,23 @@ class RDBDataTable(BaseDataTable):
         :return: Number of rows deleted.
         """
         if template is None:
-            return None
+            return 0
 
         if len(template) == 0:
-            return {}
+            return 0
 
         template_string = self.compose_template_string(template)
         rows_returned = 0
-        try:
-            with self._db_client.cursor() as cursor:
-                query = "DELETE " + "FROM " + "`" + self._data["table_name"] + "`" + "WHERE " + template_string
-                cursor.execute(query)
-                if cursor.rowcount > 0:
-                    # commit
-                    rows_returned = cursor.rowcount
-        finally:
-            # This will always close client connection
-            # If anything fails, it will always return 0
-            self._db_client.close()
-            return rows_returned
+
+        with self._db_client.cursor() as cursor:
+            query = "DELETE " + "FROM " + "`" + self._data["table_name"] + "`" + "WHERE " + template_string
+            cursor.execute(query)
+            if cursor.rowcount > 0:
+                # commit
+                # self._db_client.commit()
+                rows_returned = cursor.rowcount
+
+        return rows_returned
 
     def update_by_key(self, key_fields, new_values):
         """
@@ -226,6 +240,9 @@ class RDBDataTable(BaseDataTable):
         # Do we actually need to store _rows variable as class attribute?
         return self._rows
 
+    def close_connection(self):
+        self._db_client.close()
+
 if __name__=='__main__':
     appearances_rdb_data_tbl = RDBDataTable(
         "appearances", {
@@ -241,8 +258,11 @@ if __name__=='__main__':
     )
 
     # print(type(appearances_rdb_data_tbl.find_by_primary_key(["aardsda01", "ATL", "2015"], ["playerID", "G_all", "GS", "G_batting", "G_defense"])))
+    print(appearances_rdb_data_tbl.find_by_primary_key(["aardsda01", "ATL", "2015"], []))
+
     # print(type(appearances_rdb_data_tbl.find_by_template({"G_all": "150", "GS": "150"}, ["playerID", "yearID"])[0]))
     # print(type(appearances_rdb_data_tbl.find_by_template({"G_all": "150", "GS": "150"}, ["playerID", "yearID"])))
     # print(type(appearances_rdb_data_tbl.find_by_template({"G_all": "123", "GS": "250"}, ["playerID", "yearID"])))
 
-    print(appearances_rdb_data_tbl.find_by_template({"G_all": "150", "GS": "140", "G_ph": "7"}))
+    # print(appearances_rdb_data_tbl.find_by_template({"G_all": "150", "GS": "140", "G_ph": "7"}))
+    # print(appearances_rdb_data_tbl.find_by_template({"G_all": "150", "GS": "140", "G_ph": "7"}))

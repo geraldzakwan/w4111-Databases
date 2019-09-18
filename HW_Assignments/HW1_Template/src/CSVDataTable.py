@@ -144,6 +144,14 @@ class CSVDataTable(BaseDataTable):
 
         return template
 
+    # Build a template which contains key columns and their value
+    def convert_to_template_from_record(self, new_record):
+        template = {}
+        for i in range(0, len(self._data['key_columns'])):
+            template[self._data['key_columns'][i]] = new_record[self._data['key_columns'][i]]
+
+        return template
+
     def find_by_primary_key(self, key_fields, field_list=None):
         """
 
@@ -365,15 +373,19 @@ class CSVDataTable(BaseDataTable):
         :return: None
         """
 
-        # Directly return if new_record is not None or
+        # Directly return if new_record is None or empty
         if new_record is None or len(new_record) == 0:
             return
 
+        # Directly return if there is a missing field
+        if new_record.keys() != self._rows[0].keys():
+            return
+
         # Get all the primary key values from new_record
-        key_values = convert_to_template(self, new_record)
+        template = self.convert_to_template_from_record(new_record)
 
         # Check if there is a record with the same set of primary keys
-        duplicate_record = self.find_by_primary_key(key_values)
+        duplicate_record = self.find_by_template(template)
 
         # Q NEED TO RAISE AN EXCEPTION IF THERE IS DUPLICATE PRIMARY KEY
         if duplicate_record is not None and len(duplicate_record) > 0:
@@ -388,13 +400,20 @@ class CSVDataTable(BaseDataTable):
 if __name__=='__main__':
     data_dir = os.path.abspath("../Data/Baseball")
 
-    connect_info = {
-        "directory": data_dir,
-        "file_name": "People.csv"
-    }
+    csv_data_tbl = CSVDataTable(
+        "Appearances", {
+            "directory": data_dir,
+            "file_name": "Appearances.csv"
+        }, [
+            "playerID",
+            "teamID",
+            "yearID"
+        ]
+    )
 
-    csv_data_tbl = CSVDataTable("people", connect_info, ["playerID"])
-    print("Created table = " + str(csv_data_tbl))
+    csv_data_tbl.insert({'yearID': '2015', 'teamID': 'ABC', 'lgID': 'NL', 'playerID': 'aardsda01', 'G_all': '33', 'GS': '0', 'G_batting': '30', 'G_defense': '33', 'G_p': '33', 'G_c': '0', 'G_1b': '0', 'G_2b': '0', 'G_3b': '0', 'G_ss': '0', 'G_lf': '0', 'G_cf': '0', 'G_rf': '0', 'G_of': '0', 'G_dh': '0', 'G_ph': '0', 'G_pr': '0'})
+
+    # print("Created table = " + str(csv_data_tbl))
 
     # List of questions for TA
     # - I know that this has been discussed several times, but just to make sure that all all attributes are treated as string or plain text right?
