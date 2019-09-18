@@ -155,12 +155,18 @@ class CSVDataTable(BaseDataTable):
 
         # Directly return if param is None or empty
         if key_fields is None:
-            return self.get_rows()
+            #Q SHOULD FAIL, NO KEY -> return NONE?
+            return None #correct
+            # return self.get_rows()
 
         if len(key_fields) == 0:
-            return self.get_rows()
+            #Q SHOULD FAIL, NO KEY -> return NONE?
+            return None
+            # return empty dictionary, reference from TA Kiran
+            # return {}
+            # return self.get_rows()
 
-        # Directly return if no primary key is set
+        #Q Directly return if no primary key is set
         if self._data['key_columns'] is None or len(self._data['key_columns']) == 0:
             return None
 
@@ -168,7 +174,7 @@ class CSVDataTable(BaseDataTable):
         # Iterate each row in data and return matching row as dict if any
         for row in self.get_rows():
             if CSVDataTable.matches_template(row, template):
-                # What if field_list is empty? I assume returning empty dict will be suitable because
+                #Q What if field_list is empty? I assume returning empty dict will be suitable because
                 # it differs from returning None and indicates that there is actually matching row
                 if field_list is None or len(field_list) == 0:
                     return {}
@@ -196,16 +202,24 @@ class CSVDataTable(BaseDataTable):
 
         # Directly return if param is None or empty
         if template is None:
-            return self.get_rows()
+            # Q SHOULD FAIL, NO KEY -> return NONE?
+            return []
+            # return None  # correct
+            # return self.get_rows()
 
         if len(template) == 0:
-            return self.get_rows()
+            # Q SHOULD FAIL, NO KEY -> return NONE?
+            return []
+            # return None
+            # return empty dictionary, reference from TA Kiran
+            # return {}
+            # return self.get_rows()
 
         # Iterate each row in data and add matching rows to a list
         matching_rows = []
         for row in self.get_rows():
             if CSVDataTable.matches_template(row, template):
-                # What if field_list is empty? I assume appending empty dict will be suitable because
+                #Q What if field_list is empty? I assume appending empty dict will be suitable because
                 # it can indicate how many rows match the template
                 if field_list is None or len(field_list) == 0:
                     matching_rows.append({})
@@ -215,10 +229,6 @@ class CSVDataTable(BaseDataTable):
                     for key in field_list:
                         needed_fields[key] = row.get(key)
                     matching_rows.append(needed_fields)
-
-        if len(matching_rows) > 0:
-            # Will be used later to handle limit, offset and order_by
-            pass
 
         return matching_rows
 
@@ -231,14 +241,14 @@ class CSVDataTable(BaseDataTable):
         :return: A count of the rows deleted.
         """
 
-        # Directly return if param is None or empty
+        #Q Directly return if param is None or empty
         if key_fields is None:
             return 0
 
         if len(key_fields) == 0:
             return 0
 
-        # Directly return if no primary key is set
+        #Q Directly return if no primary key is set
         if self._data['key_columns'] is None or len(self._data['key_columns']) == 0:
             return 0
 
@@ -248,7 +258,7 @@ class CSVDataTable(BaseDataTable):
         for i in range(0, len(rows)):
             if CSVDataTable.matches_template(rows[i], template):
                 self._delete_row(i)
-                # If we can assume there is no duplicate, we can return 1
+                #Q If we can assume there is no duplicate, we can return 1
                 return 1
 
         # No matching row
@@ -261,7 +271,7 @@ class CSVDataTable(BaseDataTable):
         :return: Number of rows deleted.
         """
 
-        # Directly return if param is None or empty
+        #Q Directly return if param is None or empty
         if template is None:
             return 0
 
@@ -294,14 +304,14 @@ class CSVDataTable(BaseDataTable):
         :return: Number of rows updated.
         """
 
-        # Directly return if param is None or empty
+        #Q Directly return if param is None or empty
         if key_fields is None or new_values is None:
             return 0
 
         if len(key_fields) == 0 or len(new_values) == 0:
             return 0
 
-        # Directly return if no primary key is set
+        #Q Directly return if no primary key is set
         if self._data['key_columns'] is None or len(self._data['key_columns']) == 0:
             return 0
 
@@ -330,7 +340,7 @@ class CSVDataTable(BaseDataTable):
         :return: Number of rows updated.
         """
 
-        # Directly return if param is None or empty
+        #Q Directly return if param is None or empty
         if template is None or new_values is None:
             return 0
 
@@ -364,9 +374,20 @@ class CSVDataTable(BaseDataTable):
         :return: None
         """
 
-        # Directly return if param is None or empty
+        # Directly return if new_record is not None or
         if new_record is None or len(new_record) == 0:
             return
+
+        # Get all the primary key values from new_record
+        key_values = convert_to_template(self, new_record)
+
+        # Check if there is a record with the same set of primary keys
+        duplicate_record = self.find_by_primary_key(key_values)
+
+        # Q NEED TO RAISE AN EXCEPTION IF THERE IS DUPLICATE PRIMARY KEY
+        if duplicate_record is not None and len(duplicate_record) > 0:
+            # What kind of exception? Does general exception suffice?
+            raise Exception
 
         self._add_row(new_record)
 
@@ -382,44 +403,16 @@ if __name__=='__main__':
     }
 
     csv_data_tbl = CSVDataTable("people", connect_info, ["playerID"])
-    # print("Created table = " + str(csv_data_tbl))
-
-    # Unit test for find_by_primary_key
-    # print(csv_data_tbl.find_by_primary_key(["aardsda01"], ["birthYear", "birthMonth"]))
-    # print(csv_data_tbl.find_by_primary_key(["aardsda01"]))
-    # print(csv_data_tbl.find_by_primary_key(["aardsda07"]))
-
-    # Unit test for find_by_template
-    # print(csv_data_tbl.find_by_template({"birthYear": "1985"}, ["birthYear", "birthMonth"]))
-    # print(csv_data_tbl.find_by_template({"birthYear": "1985", "birthMonth": "5"}, ["birthYear", "birthMonth"]))
-    # print(len(csv_data_tbl.find_by_template({"birthYear": "1985"}, ["birthYear", "birthMonth"])))
-    # print(csv_data_tbl.find_by_template({"birthYear": "1985"}))
-    # print(len(csv_data_tbl.find_by_template({"birthYear": "1985"})))
-    # print(csv_data_tbl.find_by_template({"birthYear": "1585"}, ["birthYear", "birthMonth"]))
-
-    # Unit test for delete_by_key
-    # print(csv_data_tbl.delete_by_key(["aardsda01"]))
-    # print(csv_data_tbl.delete_by_key(["aardsda01"]))
-    # print(csv_data_tbl.delete_by_key(["aardsda07"]))
-
-    # Unit test for delete_by_key
-    # print(csv_data_tbl.delete_by_template({"birthYear": "1585"}))
-    # print(csv_data_tbl.delete_by_template({"birthYear": "1985", "birthMonth": "0"}))
-    # print(len(csv_data_tbl.find_by_template({"birthYear": "1985"})))
-    # print(csv_data_tbl.delete_by_template({"birthYear": "1985", "birthMonth": "5"}))
-    # print(csv_data_tbl.delete_by_template({"birthYear": "1985"}))
-
-    # Unit test for save
-    # csv_data_tbl.save("People_test.csv")
+    print("Created table = " + str(csv_data_tbl))
 
     # List of questions for TA
-    # - How to construct unit test -> Any specified format
+    # - I know that this has been discussed several times, but just to make sure that all all attributes are treated as string or plain text right?
+    # - Confusion for by_key methods, do we accept list of key values or template? I've read Piazza and come to conclusion that it should be list of key values. Just need to reconfirm.
+    # - Can we assume no two rows have the same set of primary keys so that for delete_by_key and update_by_key we always return either 0 or 1?
+    # - Corner cases? e.g. key_fields, field_list, template or new_values is None or empty. Do we assume ourselves?
+    # e.g. if key_fields or template is empty for find function, we return all rows (like select all)
+    # - How to test save function? -> no need
+    # - How to construct unit test -> Any specified format -> seems that this is loose
     # https://piazza.com/class/jy3jm0i73f8584?cid=71
-    # - Do we treat each column differently or can it be just text for all?
-    # - For delete_by_key and update_by_key why do we need to return count of rows deleted? Should that always be one?
-    # Assuming no two rows have the same set of primary keys
-    # - Confusion for by_key methods, do we accept list of key values or template?
-    # - If needed_field is None, what should I return?
-    # - Corner cases? e.g. value is None or template is empty
-    # - The difference between insert and add_row, add_row is already implemented
-    # - Which database should I use to create test unit? Should I cover all cases?
+    # - Prof. mentions that we should use Batting, People and Appearance data as toy database. Should we create unit test on all those data?
+    # - Should I cover all cases? Can I use pytest? It makes me easier to track test coverage
