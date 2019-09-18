@@ -172,21 +172,13 @@ class CSVDataTable(BaseDataTable):
 
         template = self.convert_to_template(key_fields)
         # Iterate each row in data and return matching row as dict if any
-        for row in self.get_rows():
-            if CSVDataTable.matches_template(row, template):
-                #Q What if field_list is empty? I assume returning empty dict will be suitable because
-                # it differs from returning None and indicates that there is actually matching row
-                if field_list is None or len(field_list) == 0:
-                    return {}
+        ret_list = self.find_by_template(template, field_list)
 
-                # If not, copy needed fields from the row to return variable
-                needed_fields = {}
-                for key in field_list:
-                    needed_fields[key] = row.get(key)
-                return needed_fields
-
-        # No matching row
-        return None
+        if len(ret_list) == 0:
+            # No matching row
+            return None
+        else:
+            return ret_list[0]
 
     def find_by_template(self, template, field_list=None, limit=None, offset=None, order_by=None):
         """
@@ -219,10 +211,9 @@ class CSVDataTable(BaseDataTable):
         matching_rows = []
         for row in self.get_rows():
             if CSVDataTable.matches_template(row, template):
-                #Q What if field_list is empty? I assume appending empty dict will be suitable because
-                # it can indicate how many rows match the template
+                #Q What if field_list is empty? I assume appending the whole will be suitable, something like SELECT *
                 if field_list is None or len(field_list) == 0:
-                    matching_rows.append({})
+                    matching_rows.append(row)
                 else:
                     # If not, copy needed fields from the row to return variable
                     needed_fields = {}

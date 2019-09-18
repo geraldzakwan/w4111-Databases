@@ -38,12 +38,12 @@ class RDBDataTable(BaseDataTable):
         # e.g. ALTER TABLE `appearances` MODIFY COLUMN `yearID` VARCHAR (4) NOT NULL; -> all yearID is of length 4
         with self._db_client.cursor() as cursor:
             primary_key_string = self.compose_field_list_string(self._data["key_columns"])
+            # Q How if there is already a primary key? -> drop first
+            # Q But then again, how to know the primary keys to drop?
             try:
                 query = "ALTER TABLE " + "`" + self._data["table_name"] + "` ADD PRIMARY KEY " + "(" + primary_key_string + ");"
                 cursor.execute(query)
             except:
-                #Q How if there is already a primary key? -> drop first
-                #Q But then again, how to know the primary keys to drop?
                 query = "ALTER TABLE " + "`" + self._data["table_name"] + "` DROP PRIMARY KEY, " + "ADD PRIMARY KEY " + "(" + primary_key_string + ");"
                 cursor.execute(query)
 
@@ -76,6 +76,14 @@ class RDBDataTable(BaseDataTable):
 
         return field_list_string
 
+    # Build a template which contains key columns and their value
+    def convert_to_template(self, key_fields):
+        template = {}
+        for i in range(0, len(self._data['key_columns'])):
+            template[self._data['key_columns'][i]] = key_fields[i]
+
+        return template
+
     def find_by_primary_key(self, key_fields, field_list=None):
         """
 
@@ -90,28 +98,13 @@ class RDBDataTable(BaseDataTable):
         if len(key_fields) == 0:
             return None
 
-        keys_string = self.compose_keys_string(key_fields)
+        template = self.convert_to_template(key_fields)
+        ret_list = self.find_by_template(template, field_list)
 
-        # Q How if field_list is None, {} or {"*"}
-        if field_list is None:
-            field_list_string = "*"
-        elif len(field_list) == 0:
-            field_list_string = "*"
+        if len(ret_list) == 0:
+            return None
         else:
-            field_list_string = self.compose_field_list_string(field_list)
-
-        with self._db_client.cursor() as cursor:
-            query = "SELECT " + field_list_string + " FROM " + "`" + self._data["table_name"] + "`" + " WHERE " + keys_string + ";"
-            cursor.execute(query)
-            result = cursor.fetchone()
-
-            if result is None:
-                return None
-            if field_list is None:
-                return {}
-            if len(field_list) == 0:
-                return {}
-            return result
+            return ret_list[0]
 
     def find_by_template(self, template, field_list=None, limit=None, offset=None, order_by=None):
         """
@@ -146,16 +139,6 @@ class RDBDataTable(BaseDataTable):
 
             if len(result) == 0:
                 return []
-            if field_list is None:
-                ret_list = []
-                for i in range(0, len(result)):
-                    ret_list.append({})
-                return ret_list
-            if len(field_list) == 0:
-                ret_list = []
-                for i in range(0, len(result)):
-                    ret_list.append({})
-                return ret_list
             return result
 
     def delete_by_key(self, key_fields):
@@ -259,5 +242,7 @@ if __name__=='__main__':
 
     # print(type(appearances_rdb_data_tbl.find_by_primary_key(["aardsda01", "ATL", "2015"], ["playerID", "G_all", "GS", "G_batting", "G_defense"])))
     # print(type(appearances_rdb_data_tbl.find_by_template({"G_all": "150", "GS": "150"}, ["playerID", "yearID"])[0]))
-    print(type(appearances_rdb_data_tbl.find_by_template({"G_all": "150", "GS": "150"}, ["playerID", "yearID"])))
-    print(type(appearances_rdb_data_tbl.find_by_template({"G_all": "123", "GS": "250"}, ["playerID", "yearID"])))
+    # print(type(appearances_rdb_data_tbl.find_by_template({"G_all": "150", "GS": "150"}, ["playerID", "yearID"])))
+    # print(type(appearances_rdb_data_tbl.find_by_template({"G_all": "123", "GS": "250"}, ["playerID", "yearID"])))
+
+    print(appearances_rdb_data_tbl.find_by_template({"G_all": "150", "GS": "140", "G_ph": "7"}))

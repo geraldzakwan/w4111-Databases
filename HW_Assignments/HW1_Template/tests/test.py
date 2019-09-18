@@ -19,7 +19,7 @@ logger.setLevel(logging.DEBUG)
 # data_dir = os.path.abspath("../Data/Baseball")
 data_dir = os.path.abspath("Data/Baseball")
 
-# Check if two list of dicts are the same, regardless the order
+# Check if two list of dicts are the same, regardless of the order of the elements
 def compare_two_list_of_dicts(a, b):
     # Get random field from field_list
     random_field = next(iter(a[0]))
@@ -71,10 +71,11 @@ def test_find_by_primary_key(appearances_csv, appearances_rdb):
 
     # A row matches the set of primary keys but no field_list is provided
     # I assume I just return an empty dictionary in this case
-    assert appearances_csv.find_by_primary_key(["aardsda01", "ATL", "2015"], None) == {}
-    assert appearances_csv.find_by_primary_key(["aardsda01", "ATL", "2015"], []) == {}
-    assert appearances_rdb.find_by_primary_key(["aardsda01", "ATL", "2015"], None) == {}
-    assert appearances_rdb.find_by_primary_key(["aardsda01", "ATL", "2015"], []) == {}
+    label = {'GS': '0', 'G_1b': '0', 'G_2b': '0', 'G_3b': '0', 'G_all': '33', 'G_batting': '30', 'G_c': '0', 'G_cf': '0', 'G_defense': '33', 'G_dh': '0', 'G_lf': '0', 'G_of': '0', 'G_p': '33', 'G_ph': '0', 'G_pr': '0', 'G_rf': '0', 'G_ss': '0', 'lgID': 'NL', 'playerID': 'aardsda01', 'teamID': 'ATL', 'yearID': '2015'}
+    assert appearances_csv.find_by_primary_key(["aardsda01", "ATL", "2015"], None) == label
+    assert appearances_csv.find_by_primary_key(["aardsda01", "ATL", "2015"], []) == label
+    assert appearances_rdb.find_by_primary_key(["aardsda01", "ATL", "2015"], None) == label
+    assert appearances_rdb.find_by_primary_key(["aardsda01", "ATL", "2015"], []) == label
 
     # No rows match the set of primary keys
     assert appearances_csv.find_by_primary_key(["aardsda01", "ATM", "2015"], ["playerID", "G_all", "GS", "G_batting", "G_defense"]) == None
@@ -94,10 +95,10 @@ def test_find_by_template(appearances_csv, appearances_rdb):
     assert compare_two_list_of_dicts(appearances_rdb.find_by_template({"G_all": "150", "GS": "140", "G_ph": "7"}, ["playerID", "teamID", "yearID"]), label)
 
     # Row matches the set of primary keys but no field_list is provided
-    # I assume I just return an empty dictionary for each element of the list in this case
-    label = [{}, {}, {}]
-    assert appearances_csv.find_by_template({"G_all": "150", "GS": "140", "G_ph": "7"}) == label
-    assert appearances_rdb.find_by_template({"G_all": "150", "GS": "140", "G_ph": "7"}) == label
+    # I assume I just return a whole row for each element of the list in this case
+    label = [{'yearID': '2004', 'teamID': 'BOS', 'lgID': 'AL', 'playerID': 'millake01', 'G_all': '150', 'GS': '140', 'G_batting': '150', 'G_defense': '137', 'G_p': '0', 'G_c': '0', 'G_1b': '69', 'G_2b': '0', 'G_3b': '0', 'G_ss': '0', 'G_lf': '20', 'G_cf': '0', 'G_rf': '55', 'G_of': '74', 'G_dh': '8', 'G_ph': '7', 'G_pr': '0'}, {'yearID': '1963', 'teamID': 'HOU', 'lgID': 'NL', 'playerID': 'staubru01', 'G_all': '150', 'GS': '140', 'G_batting': '150', 'G_defense': '144', 'G_p': '0', 'G_c': '0', 'G_1b': '109', 'G_2b': '0', 'G_3b': '0', 'G_ss': '0', 'G_lf': '0', 'G_cf': '0', 'G_rf': '49', 'G_of': '49', 'G_dh': '0', 'G_ph': '7', 'G_pr': '1'}, {'yearID': '2015', 'teamID': 'SLN', 'lgID': 'NL', 'playerID': 'wongko01', 'G_all': '150', 'GS': '140', 'G_batting': '150', 'G_defense': '147', 'G_p': '0', 'G_c': '0', 'G_1b': '0', 'G_2b': '147', 'G_3b': '0', 'G_ss': '0', 'G_lf': '0', 'G_cf': '0', 'G_rf': '0', 'G_of': '0', 'G_dh': '0', 'G_ph': '7', 'G_pr': '0'}]
+    assert compare_two_list_of_dicts(appearances_csv.find_by_template({"G_all": "150", "GS": "140", "G_ph": "7"}), label)
+    assert compare_two_list_of_dicts(appearances_rdb.find_by_template({"G_all": "150", "GS": "140", "G_ph": "7"}), label)
 
     # No rows match the template, returning empty list
     assert appearances_csv.find_by_template({"G_all": "123", "GS": "250"}, ["playerID", "yearID"]) == []
