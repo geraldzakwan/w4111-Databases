@@ -136,21 +136,21 @@ class CSVDataTable(BaseDataTable):
 
         return result
 
-    # Build a template which contains key columns and their value
-    def convert_to_template(self, key_fields):
-        template = {}
+    # Build a template which contains only key columns and their value
+    def get_key_columns_dict_from_key_fields(self, key_fields):
+        key_columns_dict = {}
         for i in range(0, len(self._data['key_columns'])):
-            template[self._data['key_columns'][i]] = key_fields[i]
+            key_columns_dict[self._data['key_columns'][i]] = key_fields[i]
 
-        return template
+        return key_columns_dict
 
-    # Build a template which contains key columns and their value
-    def convert_to_template_from_record(self, new_record):
-        template = {}
+    # Build a template which contains only key columns and their value
+    def get_key_columns_dict_from_template(self, template):
+        key_columns_dict = {}
         for i in range(0, len(self._data['key_columns'])):
-            template[self._data['key_columns'][i]] = new_record[self._data['key_columns'][i]]
+            key_columns_dict[self._data['key_columns'][i]] = template[self._data['key_columns'][i]]
 
-        return template
+        return key_columns_dict
 
     def find_by_primary_key(self, key_fields, field_list=None):
         """
@@ -178,7 +178,7 @@ class CSVDataTable(BaseDataTable):
         if self._data['key_columns'] is None or len(self._data['key_columns']) == 0:
             return None
 
-        template = self.convert_to_template(key_fields)
+        template = self.get_key_columns_dict_from_key_fields(key_fields)
         # Iterate each row in data and return matching row as dict if any
         ret_list = self.find_by_template(template, field_list)
 
@@ -251,7 +251,7 @@ class CSVDataTable(BaseDataTable):
         if self._data['key_columns'] is None or len(self._data['key_columns']) == 0:
             return 0
 
-        template = self.convert_to_template(key_fields)
+        template = self.get_key_columns_dict_from_key_fields(key_fields)
         # Iterate each row in data and add the row's index if key matches
         rows = self.get_rows()
         for i in range(0, len(rows)):
@@ -314,7 +314,7 @@ class CSVDataTable(BaseDataTable):
         if self._data['key_columns'] is None or len(self._data['key_columns']) == 0:
             return 0
 
-        template = self.convert_to_template(key_fields)
+        template = self.get_key_columns_dict_from_key_fields(key_fields)
         idx = -1
         i = 0
         # Iterate each row in data and update matching row if any
@@ -346,7 +346,13 @@ class CSVDataTable(BaseDataTable):
         if len(template) == 0 or len(new_values) == 0:
             return 0
 
-        template = self.convert_to_template(key_fields)
+        # Primary key constraint:
+        if self.violate_primary_key_constraint(template):
+            # What kind of exception? Does general exception suffice?
+            print('Violates primary key constraint')
+            raise Exception
+
+        template = self.get_key_columns_dict_from_key_fields(key_fields)
         r_indexes = []
         i = 0
         # Iterate each row in data and update matching row if any
@@ -381,18 +387,26 @@ class CSVDataTable(BaseDataTable):
         if new_record.keys() != self._rows[0].keys():
             return
 
+        # Q NEED TO RAISE AN EXCEPTION IF THERE IS DUPLICATE PRIMARY KEY
+        # Primary key constraint:
+        if self.violate_primary_key_constraint(new_record):
+            # What kind of exception? Does general exception suffice?
+            print('Violates primary key constraint')
+            raise Exception
+
+        self._add_row(new_record)
+
+    def violate_primary_key_constraint(self, record):
         # Get all the primary key values from new_record
-        template = self.convert_to_template_from_record(new_record)
+        template = self.get_key_columns_dict_from_template(record)
 
         # Check if there is a record with the same set of primary keys
         duplicate_record = self.find_by_template(template)
 
         # Q NEED TO RAISE AN EXCEPTION IF THERE IS DUPLICATE PRIMARY KEY
         if duplicate_record is not None and len(duplicate_record) > 0:
-            # What kind of exception? Does general exception suffice?
-            raise Exception
-
-        self._add_row(new_record)
+            return True
+        return False
 
     def get_rows(self):
         return self._rows

@@ -83,7 +83,7 @@ class RDBDataTable(BaseDataTable):
         return field_list_string
 
     # Build a template which contains key columns and their value
-    def convert_to_template(self, key_fields):
+    def get_key_columns_dict_from_key_fields(self, key_fields):
         template = {}
         for i in range(0, len(self._data['key_columns'])):
             template[self._data['key_columns'][i]] = key_fields[i]
@@ -110,7 +110,7 @@ class RDBDataTable(BaseDataTable):
         if len(key_fields) == 0:
             return None
 
-        template = self.convert_to_template(key_fields)
+        template = self.get_key_columns_dict_from_key_fields(key_fields)
         ret_list = self.find_by_template(template, field_list)
 
         if len(ret_list) == 0:
@@ -248,7 +248,7 @@ if __name__=='__main__':
         "appearances", {
             "host": "localhost",
             "user": "dbuser",
-            "password": "dbuser",
+            "password": "dbuserdbuser",
             "db": "lahman2019"
         }, [
            "playerID",
