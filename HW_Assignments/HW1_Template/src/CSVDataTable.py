@@ -1,5 +1,6 @@
 
 from src.BaseDataTable import BaseDataTable
+from src.Helper import Helper
 import copy
 import csv
 import logging
@@ -378,19 +379,10 @@ class CSVDataTable(BaseDataTable):
         :param new_record: A dictionary representing a row to add to the set of records.
         :return: None
         """
-
-        # Directly return if new_record is None or empty
-        if new_record is None or len(new_record) == 0:
+        if not Helper.is_new_record_valid(new_record, self._rows[0].keys()):
             return
 
-        # Directly return if there is a missing field
-        if new_record.keys() != self._rows[0].keys():
-            return
-
-        # Q NEED TO RAISE AN EXCEPTION IF THERE IS DUPLICATE PRIMARY KEY
-        # Primary key constraint:
         if self.violate_primary_key_constraint(new_record):
-            # What kind of exception? Does general exception suffice?
             print('Violates primary key constraint')
             raise Exception
 

@@ -4,7 +4,12 @@ Some general assumptions:
 
 Some design decisions:
 
-CSVDataTable implementation
+General:
+
+    - For find_by_primary_key, return None if no key_field is specified
+    - For insert, I raise Exception if there is any missing field
+
+Specific to CSVDataTable implementation
 
     - Primary key constraint:
 
@@ -24,3 +29,12 @@ CSVDataTable implementation
     If set to true, it will always call save function after insert/update/delete
 
     - Parameter validation
+
+Specific to RDBDataTable implementation
+
+    - Primary key constraint
+
+    Not implemented in the code because MySQL has already handled, I just need to make the test case that simulates
+    how MySQL reacts if the constraint is violated
+
+    -s
