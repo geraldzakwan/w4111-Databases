@@ -1,6 +1,19 @@
 Some general assumptions:
 
 - If field_list = None or field_list = empty, I treated it just like "SELECT *" SQL query, so I return all fields
+- If table has no primary key, these are the behaviors:
+    1. find_by_primary_key returns None
+    2. delete_by_primary_key returns 0
+    3. update_by_primary_key returns 0
+- If template is None/empty, these are the behaviors:
+    1. find_by_template returns all rows -> like SELECT without WHERE clause
+    2. delete_by_template deletes everything ->
+    3. update_by_template updates everything ->
+
+Assumptions for RDBDataTable:
+
+- 'table_name' param passed on class constructor is the name of the actual table in mysql. I use this for querying stuffs.
+- Key columns passed to class constructor matches . This is mentioned by Prof. Ferguson in Piazza, question 115
 
 Some design decisions:
 

@@ -1,39 +1,14 @@
 class Helper():
     @staticmethod
-    # Return True if new_record is not None and contains all the column keys of the table
-    def are_key_fields_valid(key_fields, primary_keys):
-        if key_fields is None:
-            return False
+    # Return True if a list or dict is not None and not empty
+    def is_empty(any_list_or_dict):
+        if any_list_or_dict is None:
+            return True
 
-        if len(key_fields) == 0:
-            return False
+        if len(any_list_or_dict) == 0:
+            return True
 
-        if set(key_fields) != set(primary_keys):
-            return False
-
-        return True
-
-    @staticmethod
-    # Return True if new_record is not None and contains all the column keys of the table
-    def is_template_valid(template):
-        if template is None:
-            return False
-
-        if len(template) == 0:
-            return False
-
-        return True
-
-    @staticmethod
-    # Return True if new_record is not None and contains all the column keys of the table
-    def are_new_values_valid(new_values):
-        if new_values is None:
-            return False
-
-        if new_values == 0:
-            return False
-
-        return True
+        return False
 
     @staticmethod
     # Return True if new_record is not None and contains all the column keys of the table
@@ -48,3 +23,13 @@ class Helper():
             return False
 
         return True
+
+    @staticmethod
+    # Check if two list of dicts are the same, regardless of the order of the elements
+    def compare_two_list_of_dicts(l1, l2):
+        random_key = next(iter(a[0]))
+
+        sorted_l1 = sorted(l1, key=lambda k: k[random_key])
+        sorted_l2 = sorted(l2, key=lambda k: k[random_key])
+
+        return sorted_l1 == sorted_l2
