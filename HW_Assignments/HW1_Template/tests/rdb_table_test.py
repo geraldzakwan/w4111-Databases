@@ -42,6 +42,9 @@ def test_find_by_primary_key(appearances_rdb):
     # No rows match the template, returning None
     assert appearances_rdb.find_by_primary_key(['aardsda01', 'ATM', '2015'], ['playerID', 'G_all', 'GS', 'G_batting', 'G_defense']) == None
 
+    appearances_rdb.close_connection()
+    assert appearances_rdb.get_connection().open == False
+
 def test_find_by_template(appearances_rdb):
     # If no template is provided, all the rows are returned
     # This mimics the database behavior of 'SELECT' without 'WHERE' clause
@@ -67,6 +70,9 @@ def test_find_by_template(appearances_rdb):
     # No rows match the template, returning an empty list
     assert appearances_rdb.find_by_template({'G_all': '123', 'GS': '250'}, ['playerID', 'yearID']) == []
 
+    appearances_rdb.close_connection()
+    assert appearances_rdb.get_connection().open == False
+
 def test_insert(appearances_rdb):
     # Example when insert fails because of conflicting primary keys
     with pytest.raises(Exception):
@@ -90,6 +96,9 @@ def test_insert(appearances_rdb):
     # Check that it exists after insertion
     assert appearances_rdb.find_by_primary_key(['aardsda01', 'ABC', '2015'], ['yearID', 'teamID', 'playerID']) == {'yearID': '2015', 'teamID': 'ABC', 'playerID': 'aardsda01'}
 
+    appearances_rdb.close_connection()
+    assert appearances_rdb.get_connection().open == False
+
 def test_delete_by_key(appearances_rdb):
     # Function fails if no key_fields are provided (None or empty) or if the dimension doesn't match with key_columns dimension
     with pytest.raises(Exception):
@@ -107,6 +116,9 @@ def test_delete_by_key(appearances_rdb):
     assert appearances_rdb.delete_by_key(['aardsda01', 'ABC', '2015']) == 1
     # Check if that record doesn't exist anymore
     assert appearances_rdb.find_by_primary_key(['aardsda01', 'ABC', '2015']) == None
+
+    appearances_rdb.close_connection()
+    assert appearances_rdb.get_connection().open == False
 
 def test_delete_by_template(appearances_rdb):
     # Function fails if there is incorrect columns in template or field_list
@@ -127,6 +139,9 @@ def test_delete_by_template(appearances_rdb):
     assert appearances_rdb.delete_by_template({}) == 105789 - 83
     # Database now doesn't have any rows
     assert len(appearances_rdb.find_by_template({})) == 0
+
+    appearances_rdb.close_connection()
+    assert appearances_rdb.get_connection().open == False
 
 def test_update_by_key(appearances_rdb):
     # Function fails if no key_fields are provided (None or empty) or if the dimension doesn't match with key_columns dimension
@@ -164,7 +179,8 @@ def test_update_by_key(appearances_rdb):
     #         {'yearID': '2015', 'teamID': 'ATL', 'lgID': 'NL', 'playerID': 'aardsda01', 'G_all': '33', 'GS': '0',
     #          'G_batting': '30', 'G_defense': '33', 'G_p': '33', 'G_c': '0', 'G_1b': '0', 'G_2b': '0', 'G_3b': '0',
     #          'G_ss': '0', 'G_lf': '0', 'G_cf': '0', 'G_rf': '0', 'G_of': '0', 'G_dh': '0', 'G_ph': '0', 'G_pr': '0'})
-    assert 0 == 1
+    appearances_rdb.close_connection()
+    assert appearances_rdb.get_connection().open == False
 
 def test_no_primary_key(appearances_rdb):
     # All by_key methods should fail if table has no primary keys
@@ -183,3 +199,6 @@ def test_no_primary_key(appearances_rdb):
         assert appearances_rdb.delete_by_key([]) == 0
     with pytest.raises(Exception):
         assert appearances_rdb.update_by_key([], []) == 0
+
+    appearances_rdb.close_connection()
+    assert appearances_rdb.get_connection().open == False
