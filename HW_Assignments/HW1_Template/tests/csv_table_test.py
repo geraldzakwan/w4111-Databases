@@ -8,15 +8,26 @@ data_dir = os.path.abspath('Data/Baseball')
 @pytest.fixture
 def appearances_csv():
     return CSVDataTable(
-        "Appearances", {
-            "directory": data_dir,
-            "file_name": "Appearances.csv"
+        'Appearances', {
+            'directory': data_dir,
+            'file_name': 'Appearances.csv'
         }, [
-            "playerID",
-            "teamID",
-            "yearID"
+            'playerID',
+            'teamID',
+            'yearID'
         ]
     )
+
+def test_bad_primary_keys():
+    with pytest.raises(Exception):
+        return CSVDataTable(
+            'Appearances', {
+                'directory': data_dir,
+                'file_name': 'Appearances.csv'
+            }, [
+                'playerID'
+            ]
+        )
 
 def test_find_by_primary_key(appearances_csv):
     # Example when a row matches the set of primary keys
@@ -192,7 +203,7 @@ def test_update_by_template(appearances_csv):
 
     # Function fails if there is incorrect columns in template or field_list
     with pytest.raises(Exception):
-        assert appearances_csv.delete_by_template({'wrong': '150'})
+        assert appearances_csv.update_by_template({'wrong': '150'})
 
 def test_no_primary_key(appearances_csv):
     # All by_key methods should fail if table has no primary keys

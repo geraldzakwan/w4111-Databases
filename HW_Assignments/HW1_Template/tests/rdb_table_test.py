@@ -186,7 +186,7 @@ def test_update_by_template(appearances_rdb):
     # If we change all the playerIDs that play for 'ATL' in '1970' to one of the playerID,
     # it will cause duplicate primary keys and raise Exception
     with pytest.raises(Exception):
-        appearances_rdb.update_by_key({'teamID': 'ATL', 'yeadID': '1970'}, {'playerID': 'aaronha01'})
+        appearances_rdb.update_by_template({'teamID': 'ATL', 'yeadID': '1970'}, {'playerID': 'aaronha01'})
 
     # If no template is provided (None or empty), ALL ROWS are updated
     # This mimics the behavior of 'UPDATE' without 'WHERE' clause
@@ -195,7 +195,7 @@ def test_update_by_template(appearances_rdb):
 
     # Function fails if there is incorrect columns in template or field_list
     with pytest.raises(Exception):
-        assert appearances_rdb.delete_by_template({'wrong': '150'})
+        assert appearances_rdb.update_by_template({'wrong': '150'})
 
     appearances_rdb.close_connection()
     assert appearances_rdb.get_connection().open == False

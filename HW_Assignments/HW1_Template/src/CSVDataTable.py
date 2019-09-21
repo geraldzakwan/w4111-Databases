@@ -5,6 +5,11 @@ import csv
 import logging
 import json
 import os
+# I don't use pandas, I just leave it as is from the starter code
+import pandas as pd
+
+pd.set_option("display.width", 256)
+pd.set_option('display.max_columns', 20)
 
 class CSVDataTable(BaseDataTable):
     '''
@@ -97,15 +102,31 @@ class CSVDataTable(BaseDataTable):
             csv_d_rdr = csv.DictReader(txt_file)
             for r in csv_d_rdr:
                 if i == 0:
-                    if not Helper.is_column_list_valid(self._data['key_columns'], r.keys()):
-                        print('Specified primary keys don\'t match table columns')
-                        raise Exception
+                    if not Helper.is_empty(self._data['key_columns']):
+                        if not Helper.is_column_list_valid(self._data['key_columns'], r.keys()):
+                            self._logger.error('Specified primary keys don\'t match table columns')
+                            raise Exception
                 self._add_row(r)
                 i = i + 1
 
-        # Primary key checking constraint, using find_by_template to check if it breaks
-        # If it is, load_fail
+        if not Helper.is_empty(self._data['key_columns']):
+            if not self._check_primary_key_constraint():
+                self._logger.error('The specified primary keys don\'t comply with primary key constraint')
+                raise Exception
+
         self._logger.debug('CSVDataTable._load: Loaded ' + str(len(self._rows)) + ' rows')
+
+    def _check_primary_key_constraint(self):
+        list_of_key_values_tuple = []
+        for row in self.get_rows():
+            key_values = []
+
+            for key in self._data['key_columns']:
+                key_values.append(row[key])
+
+            list_of_key_values_tuple.append(tuple(key_values))
+
+        return len(list_of_key_values_tuple) == len(set(list_of_key_values_tuple))
 
     def get_columns(self):
         return self._rows[0].keys()
@@ -150,11 +171,11 @@ class CSVDataTable(BaseDataTable):
             by the key.
         '''
         if Helper.is_empty(self._data['key_columns']):
-            print('Table has no primary keys')
+            self._logger.error('Table has no primary keys')
             raise Exception
 
         if not Helper.are_key_fields_valid(key_fields, self._data['key_columns']):
-            print('Key fields are not valid')
+            self._logger.error('Key fields are not valid')
             raise Exception
 
         template = Helper.convert_key_fields_to_template(key_fields, self._data['key_columns'])
@@ -178,12 +199,12 @@ class CSVDataTable(BaseDataTable):
         '''
         if not Helper.is_empty(template):
             if not Helper.is_template_valid(template, self.get_columns()):
-                print('Some columns in the specified template don\'t match table columns')
+                self._logger.error('Some columns in the specified template don\'t match table columns')
                 raise Exception
 
         if not Helper.is_empty(field_list):
             if not Helper.is_column_list_valid(field_list, self.get_columns()):
-                print('Some columns in the specified field_list don\'t match table columns')
+                self._logger.error('Some columns in the specified field_list don\'t match table columns')
                 raise Exception
 
         matching_rows = []
@@ -206,11 +227,11 @@ class CSVDataTable(BaseDataTable):
         :return: A count of the rows deleted.
         '''
         if Helper.is_empty(self._data['key_columns']):
-            print('Table has no primary keys')
+            self._logger.error('Table has no primary keys')
             raise Exception
 
         if not Helper.are_key_fields_valid(key_fields, self._data['key_columns']):
-            print('Key fields are not valid')
+            self._logger.error('Key fields are not valid')
             raise Exception
 
         template = Helper.convert_key_fields_to_template(key_fields, self._data['key_columns'])
@@ -225,7 +246,7 @@ class CSVDataTable(BaseDataTable):
         '''
         if not Helper.is_empty(template):
             if not Helper.is_template_valid(template, self.get_columns()):
-                print('Some columns in the specified template don\'t match table columns')
+                self._logger.error('Some columns in the specified template don\'t match table columns')
                 raise Exception
 
         rows = self.get_rows()
@@ -255,11 +276,11 @@ class CSVDataTable(BaseDataTable):
         :return: Number of rows updated.
         '''
         if Helper.is_empty(self._data['key_columns']):
-            print('Table has no primary keys')
+            self._logger.error('Table has no primary keys')
             raise Exception
 
         if not Helper.are_key_fields_valid(key_fields, self._data['key_columns']):
-            print('Key fields are not valid')
+            self._logger.error('Key fields are not valid')
             raise Exception
 
         if Helper.is_empty(new_values):
@@ -281,7 +302,7 @@ class CSVDataTable(BaseDataTable):
 
         if not Helper.is_empty(template):
             if not Helper.is_template_valid(template, self.get_columns()):
-                print('Some columns in the specified template don\'t match table columns')
+                self._logger.error('Some columns in the specified template don\'t match table columns')
                 raise Exception
 
         # Extract key_fields from template if any
@@ -301,7 +322,7 @@ class CSVDataTable(BaseDataTable):
                     new_keys_template = Helper.change_keys(copy.copy(rows[i]), changed_keys)
 
                     if self._violate_primary_key_constraint(new_keys_template):
-                        print('Violates primary key constraint')
+                        self._logger.error('Violates primary key constraint')
                         raise Exception
 
                 r_indexes.append(i)
@@ -322,11 +343,11 @@ class CSVDataTable(BaseDataTable):
         :return: None
         '''
         if not Helper.is_new_record_valid(new_record, self.get_columns()):
-            print('new_record must contains all columns')
+            self._logger.error('new_record must contains all columns')
             raise Exception
 
         if self._violate_primary_key_constraint(new_record):
-            print('Violates primary key constraint')
+            self._logger.error('Violates primary key constraint')
             raise Exception
 
         self._add_row(new_record)

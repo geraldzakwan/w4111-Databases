@@ -1,5 +1,6 @@
 from src.BaseDataTable import BaseDataTable
 from src.Helper import Helper
+import logging
 import pymysql
 
 class RDBDataTable(BaseDataTable):
@@ -21,6 +22,8 @@ class RDBDataTable(BaseDataTable):
             'connect_info': connect_info,
             'key_columns': key_columns
         }
+
+        self._logger = logging.getLogger()
 
         self._connection = pymysql.connect(host=connect_info['host'], user=connect_info['user'], password=connect_info['password'], db=connect_info['db'], charset='utf8', cursorclass=pymysql.cursors.DictCursor)
 
@@ -81,11 +84,11 @@ class RDBDataTable(BaseDataTable):
             by the key.
         '''
         if Helper.is_empty(self._data['key_columns']):
-            print('Table has no primary keys')
+            self._logger.error('Table has no primary keys')
             raise Exception
 
         if not Helper.are_key_fields_valid(key_fields, self._data['key_columns']):
-            print('Key fields are not valid')
+            self._logger.error('Key fields are not valid')
             raise Exception
 
         template = Helper.convert_key_fields_to_template(key_fields, self._data['key_columns'])
@@ -109,7 +112,7 @@ class RDBDataTable(BaseDataTable):
         template_string = ''
         if not Helper.is_empty(template):
             if not Helper.is_template_valid(template, self.get_columns()):
-                print('Some columns in the specified template don\'t match table columns')
+                self._logger.error('Some columns in the specified template don\'t match table columns')
                 raise Exception
             template_string = 'WHERE ' + self._compose_template_string(template)
 
@@ -128,7 +131,7 @@ class RDBDataTable(BaseDataTable):
                     return []
                 return result
             except pymysql.Error as error:
-                print('Failed to find record(s) in the table {}'.format(error))
+                self._logger.error('Failed to find record(s) in the table {}'.format(error))
                 raise Exception
 
     def delete_by_key(self, key_fields):
@@ -140,11 +143,11 @@ class RDBDataTable(BaseDataTable):
         :return: A count of the rows deleted.
         '''
         if Helper.is_empty(self._data['key_columns']):
-            print('Table has no primary keys')
+            self._logger.error('Table has no primary keys')
             raise Exception
 
         if not Helper.are_key_fields_valid(key_fields, self._data['key_columns']):
-            print('Key fields are not valid')
+            self._logger.error('Key fields are not valid')
             raise Exception
 
         template = Helper.convert_key_fields_to_template(key_fields, self._data['key_columns'])
@@ -159,7 +162,7 @@ class RDBDataTable(BaseDataTable):
         template_string = ''
         if not Helper.is_empty(template):
             if not Helper.is_template_valid(template, self.get_columns()):
-                print('Some columns in the specified template don\'t match table columns')
+                self._logger.error('Some columns in the specified template don\'t match table columns')
                 raise Exception
             template_string = 'WHERE ' + self._compose_template_string(template)
 
@@ -172,7 +175,7 @@ class RDBDataTable(BaseDataTable):
                         self.commit()
                 return cursor.rowcount
             except pymysql.Error as error:
-                print('Failed to delete record(s) in the table {}'.format(error))
+                self._logger.error('Failed to delete record(s) in the table {}'.format(error))
                 raise Exception
 
     def update_by_key(self, key_fields, new_values):
@@ -183,11 +186,11 @@ class RDBDataTable(BaseDataTable):
         :return: Number of rows updated.
         '''
         if Helper.is_empty(self._data['key_columns']):
-            print('Table has no primary keys')
+            self._logger.error('Table has no primary keys')
             raise Exception
 
         if not Helper.are_key_fields_valid(key_fields, self._data['key_columns']):
-            print('Key fields are not valid')
+            self._logger.error('Key fields are not valid')
             raise Exception
 
         if Helper.is_empty(new_values):
@@ -209,7 +212,7 @@ class RDBDataTable(BaseDataTable):
         template_string = ''
         if not Helper.is_empty(template):
             if not Helper.is_template_valid(template, self.get_columns()):
-                print('Some columns in the specified template don\'t match table columns')
+                self._logger.error('Some columns in the specified template don\'t match table columns')
                 raise Exception
             template_string = 'WHERE ' + self._compose_template_string(template)
 
@@ -227,7 +230,7 @@ class RDBDataTable(BaseDataTable):
                         self.commit()
                 return cursor.rowcount
             except pymysql.Error as error:
-                print('Failed to update record(s) in the table {}'.format(error))
+                self._logger.error('Failed to update record(s) in the table {}'.format(error))
                 raise Exception
 
     def insert(self, new_record):
@@ -237,7 +240,7 @@ class RDBDataTable(BaseDataTable):
         :return: None
         '''
         if not Helper.is_new_record_valid(new_record, self.get_columns()):
-            print('new_record must contains all columns')
+            self._logger.error('new_record must contains all columns')
             raise Exception
 
         column_strings = '('
@@ -257,50 +260,5 @@ class RDBDataTable(BaseDataTable):
                     if self._auto_commit:
                         self.commit()
             except pymysql.Error as error:
-                print('Failed to insert record(s) into the table {}'.format(error))
+                self._logger.error('Failed to insert record(s) into the table {}'.format(error))
                 raise Exception
-
-if __name__=='__main__':
-    appearances_rdb_data_tbl = RDBDataTable(
-        'appearances', {
-            'host': 'localhost',
-            'user': 'dbuser',
-            'password': 'dbuserdbuser',
-            'db': 'lahman2019'
-        }, [
-           'playerID',
-           'teamID',
-           'yearID'
-        ]
-    )
-
-    # print(type(appearances_rdb_data_tbl.find_by_primary_key(['aardsda01', 'ATL', '2015'], ['playerID', 'G_all', 'GS', 'G_batting', 'G_defense'])))
-    # print(appearances_rdb_data_tbl.find_by_primary_key(['aardsda01', 'ATL', '2015'], []))
-
-    # print(type(appearances_rdb_data_tbl.find_by_template({'G_all': '150', 'GS': '150'}, ['playerID', 'yearID'])[0]))
-    # print(type(appearances_rdb_data_tbl.find_by_template({'G_all': '150', 'GS': '150'}, ['playerID', 'yearID'])))
-    # print(type(appearances_rdb_data_tbl.find_by_template({'G_all': '123', 'GS': '250'}, ['playerID', 'yearID'])))
-
-    # print(appearances_rdb_data_tbl.find_by_template({'G_all': '150', 'GS': '140', 'G_ph': '7'}))
-    # print(appearances_rdb_data_tbl.find_by_template({'G_all': '150', 'GS': '140', 'G_ph': '7'}))
-
-    # print(appearances_rdb_data_tbl.find_by_template(
-    #     {'yearID': '2015', 'teamID': 'ALT', 'lgID': 'NL', 'playerID': 'aardsda01', 'G_all': '33', 'GS': '0',
-    #      'G_batting': '30', 'G_defense': '33', 'G_p': '33', 'G_c': '0', 'G_1b': '0', 'G_2b': '0', 'G_3b': '0',
-    #      'G_ss': '0', 'G_lf': '0', 'G_cf': '0', 'G_rf': '0', 'G_of': '0', 'G_dh': '0', 'G_ph': '0', 'G_pr': '0'}, {}))
-    # appearances_rdb_data_tbl.insert({'yearID': '2015', 'teamID': 'ALT', 'lgID': 'NL', 'playerID': 'aardsda01', 'G_all': '33', 'GS': '0', 'G_batting': '30', 'G_defense': '33', 'G_p': '33', 'G_c': '0', 'G_1b': '0', 'G_2b': '0', 'G_3b': '0', 'G_ss': '0', 'G_lf': '0', 'G_cf': '0', 'G_rf': '0', 'G_of': '0', 'G_dh': '0', 'G_ph': '0', 'G_pr': '0'})
-    # print(appearances_rdb_data_tbl.find_by_template({'yearID': '2015', 'teamID': 'ALT', 'lgID': 'NL', 'playerID': 'aardsda01', 'G_all': '33', 'GS': '0', 'G_batting': '30', 'G_defense': '33', 'G_p': '33', 'G_c': '0', 'G_1b': '0', 'G_2b': '0', 'G_3b': '0', 'G_ss': '0', 'G_lf': '0', 'G_cf': '0', 'G_rf': '0', 'G_of': '0', 'G_dh': '0', 'G_ph': '0', 'G_pr': '0'}, {}))
-
-    # print(appearances_rdb_data_tbl.delete_by_key(['aardsda01', 'ATL', '2015']))
-    # print(appearances_rdb_data_tbl.delete_by_key(['aardsda01', 'ATL', '2015']))
-    # print(appearances_rdb_data_tbl.get_columns())
-
-    appearances_rdb_data_tbl.delete_by_key(["aardsda01", "ABC", "2015"])
-    # Insert a dummy record
-    appearances_rdb_data_tbl.insert(
-        {'yearID': '2015', 'teamID': 'ABC', 'lgID': 'NL', 'playerID': 'aardsda01', 'G_all': '33', 'GS': '0',
-         'G_batting': '30', 'G_defense': '33', 'G_p': '33', 'G_c': '0', 'G_1b': '0', 'G_2b': '0', 'G_3b': '0',
-         'G_ss': '0', 'G_lf': '0', 'G_cf': '0', 'G_rf': '0', 'G_of': '0', 'G_dh': '0', 'G_ph': '0',
-         'G_pr': '0'})
-    # Delete succeeds
-    appearances_rdb_data_tbl.delete_by_key(["aardsda01", "ABC", "2015"])
