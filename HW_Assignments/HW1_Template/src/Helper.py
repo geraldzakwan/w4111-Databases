@@ -11,6 +11,17 @@ class Helper():
         return False
 
     @staticmethod
+    # Return True if a key_fields is not None, not empty and has the same dimension as key_columns
+    def are_key_fields_valid(key_fields, key_columns):
+        if Helper.is_empty(key_fields):
+            return False
+
+        if len(key_fields) != len(key_columns):
+            return False
+
+        return True
+
+    @staticmethod
     # Return True if new_record is not None and contains all the column keys of the table
     def is_new_record_valid(new_record, column_keys):
         if new_record is None:
@@ -19,7 +30,7 @@ class Helper():
         if len(new_record) == 0:
             return False
 
-        if new_record.keys() != column_keys:
+        if set(new_record.keys()) != set(column_keys):
             return False
 
         return True
@@ -27,7 +38,7 @@ class Helper():
     @staticmethod
     # Check if two list of dicts are the same, regardless of the order of the elements
     def compare_two_list_of_dicts(l1, l2):
-        random_key = next(iter(a[0]))
+        random_key = next(iter(l1[0]))
 
         sorted_l1 = sorted(l1, key=lambda k: k[random_key])
         sorted_l2 = sorted(l2, key=lambda k: k[random_key])

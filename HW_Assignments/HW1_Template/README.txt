@@ -50,4 +50,13 @@ Specific to RDBDataTable implementation
     Not implemented in the code because MySQL has already handled, I just need to make the test case that simulates
     how MySQL reacts if the constraint is violated
 
-    -s
+    - Incomplete fields
+
+    Using MysQL
+
+    - Commit
+
+    I specify a param called autocommit. If set to true, after every insert, update or delete operations, it affects
+    the database directly. If set to false, you need to call function self.commit() everytime you want to apply the
+    changes to the database. For rdb_table_test.py, I set autocommit to false so that for every test function, db
+    condition is the same.
