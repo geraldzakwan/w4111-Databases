@@ -48,11 +48,26 @@ class Helper():
         result = True
         if template is not None:
             for k, v in template.items():
+                if row['yearID'] == '1900' and row['teamID'] == 'ATL' and row['playerID'] == 'aaronha01':
+                    print(row)
                 if v != row.get(k, None):
                     result = False
                     break
 
         return result
+
+    @staticmethod
+    # Only return fields from row that are specified in field_list
+    def extract_needed_fields(field_list, row):
+        # If no field is specified, return all fields
+        if Helper.is_empty(field_list):
+            return row
+
+        needed_fields = {}
+        for key in field_list:
+            needed_fields[key] = row.get(key)
+
+        return needed_fields
 
     @staticmethod
     # Build a template which contains key columns and their value from key_fields
@@ -65,12 +80,30 @@ class Helper():
 
     @staticmethod
     # From a template, build another template which contains only key columns and their value
-    def extract_key_columns_and_values_rom_template(template, key_columns):
+    def extract_key_columns_and_values_from_template(template, key_columns):
         key_values_dict = {}
         for i in range(0, len(key_columns)):
-            key_values_dict[key_columns[i]] = template[key_columns[i]]
+            if key_columns[i] in template:
+                key_values_dict[key_columns[i]] = template[key_columns[i]]
 
         return key_values_dict
+
+    @staticmethod
+    # From a template, build another template which contains only key columns and their value
+    def extract_key_fields_from_template(template, key_columns):
+        key_fields = []
+        for i in range(0, len(key_columns)):
+            if key_columns[i] in template:
+                key_fields.append(template[key_columns[i]])
+
+        return key_fields
+
+    @staticmethod
+    def change_keys(row, new_keys_template):
+        for key in new_keys_template:
+            row[key] = new_keys_template[key]
+
+        return row
 
     @staticmethod
     # Check if two list of dicts are the same, regardless of the order of the elements

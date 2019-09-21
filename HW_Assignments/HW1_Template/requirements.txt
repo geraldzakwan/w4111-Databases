@@ -1,4 +1,4 @@
 csv
 json
-pymysql
-pytest
+pymysql==0.9.3
+pytest==3.9.1

@@ -108,7 +108,7 @@ class RDBDataTable(BaseDataTable):
         '''
         template_string = ''
         if not Helper.is_empty(template):
-            if not Helper.is_template_valid(template):
+            if not Helper.is_template_valid(template, self.get_columns()):
                 print('Some columns in the specified template don\'t match table columns')
                 raise Exception
             template_string = 'WHERE ' + self._compose_template_string(template)
@@ -158,7 +158,7 @@ class RDBDataTable(BaseDataTable):
         '''
         template_string = ''
         if not Helper.is_empty(template):
-            if not Helper.is_template_valid(template):
+            if not Helper.is_template_valid(template, self.get_columns()):
                 print('Some columns in the specified template don\'t match table columns')
                 raise Exception
             template_string = 'WHERE ' + self._compose_template_string(template)
@@ -208,7 +208,7 @@ class RDBDataTable(BaseDataTable):
 
         template_string = ''
         if not Helper.is_empty(template):
-            if not Helper.is_template_valid(template):
+            if not Helper.is_template_valid(template, self.get_columns()):
                 print('Some columns in the specified template don\'t match table columns')
                 raise Exception
             template_string = 'WHERE ' + self._compose_template_string(template)

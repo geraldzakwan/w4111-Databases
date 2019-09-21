@@ -84,7 +84,7 @@ class CSVDataTable(BaseDataTable):
 
     def _modify_rows(self, r_indexes, new_values):
         for idx in r_indexes:
-            self._modify_rows(idx, new_values)
+            self._modify_row(idx, new_values)
 
     def _load(self):
 
@@ -132,22 +132,11 @@ class CSVDataTable(BaseDataTable):
             self._logger.error('Error when saving to csv: ' + IOError)
             raise Exception
 
-    def _extract_needed_fields(self, field_list, row):
-        # If no field is specified, return all fields
-        if Helper.is_empty(field_list):
-            return row
+    def _violate_primary_key_constraint(self, new_keys_template):
+        key_fields = Helper.extract_key_fields_from_template(new_keys_template, self._data['key_columns'])
 
-        needed_fields = {}
-        for key in field_list:
-            needed_fields[key] = row.get(key)
-
-        return needed_fields
-
-    def _violate_primary_key_constraint(self, record):
-        template = Helper.extract_key_columns_and_values_rom_template(record, self._data['key_columns'])
-
-        duplicate_record = self.find_by_template(template)
-        if Helper.is_empty(duplicate_record):
+        records = self.find_by_primary_key(key_fields)
+        if Helper.is_empty(records):
             return False
 
         return True
@@ -204,7 +193,7 @@ class CSVDataTable(BaseDataTable):
                     break
 
             if Helper.matches_template(row, template):
-                matching_rows.append(self._extract_needed_fields(field_list, row))
+                matching_rows.append(Helper.extract_needed_fields(field_list, row))
 
         return matching_rows
 
@@ -277,49 +266,46 @@ class CSVDataTable(BaseDataTable):
             return 0
 
         template = Helper.convert_key_fields_to_template(key_fields, self._data['key_columns'])
-        idx = -1
-        i = 0
-        # Iterate each row in data and update matching row if any
-        for row in self.get_rows():
-            if Helper.matches_template(row, template):
-                idx = i
-                break
-            i = i + 1
 
-        if idx == -1:
-            # No matching row
-            return 0
-        else:
-            self._modify_row(idx, new_values)
-            return 1
+        return self.update_by_template(template, new_values, 1)
 
-    def update_by_template(self, template, new_values):
+    def update_by_template(self, template, new_values, limit=None):
         '''
 
         :param template: Template for rows to match.
         :param new_values: New values to set for matching fields.
         :return: Number of rows updated.
         '''
-        if template is None or new_values is None:
+        if Helper.is_empty(new_values):
             return 0
 
-        if len(template) == 0 or len(new_values) == 0:
-            return 0
+        if not Helper.is_empty(template):
+            if not Helper.is_template_valid(template, self.get_columns()):
+                print('Some columns in the specified template don\'t match table columns')
+                raise Exception
 
-        if self._violate_primary_key_constraint(template):
-            print('Violates primary key constraint')
-            raise Exception
+        # Extract key_fields from template if any
+        changed_keys = Helper.extract_key_columns_and_values_from_template(new_values, self._data['key_columns'])
 
-        template = Helper.convert_key_fields_to_template(key_fields, self._data['key_columns'])
+        rows = self.get_rows()
         r_indexes = []
-        i = 0
-        for row in self.get_rows():
-            if Helper.matches_template(row, template):
-                r_indexes.append(i)
-            i = i + 1
+        for i in range(0, len(rows)):
+            if limit is not None:
+                if len(r_indexes) == limit:
+                    break
 
-        # Use either _modify_row or _modify_rows function
-        # and return appropriate value
+            if Helper.matches_template(rows[i], template):
+                # Apply changed_keys and check if modification would result in duplicate primary key
+                if not Helper.is_empty(changed_keys):
+                    # Very important to make copy of rows[i] so that it will not be altered
+                    new_keys_template = Helper.change_keys(copy.copy(rows[i]), changed_keys)
+
+                    if self._violate_primary_key_constraint(new_keys_template):
+                        print('Violates primary key constraint')
+                        raise Exception
+
+                r_indexes.append(i)
+
         if len(r_indexes) == 0:
             return 0
         elif len(r_indexes) == 1:
@@ -335,41 +321,12 @@ class CSVDataTable(BaseDataTable):
         :param new_record: A dictionary representing a row to add to the set of records.
         :return: None
         '''
-        if not Helper.is_new_record_valid(new_record, self._rows[0].keys()):
-            return
+        if not Helper.is_new_record_valid(new_record, self.get_columns()):
+            print('new_record must contains all columns')
+            raise Exception
 
         if self._violate_primary_key_constraint(new_record):
             print('Violates primary key constraint')
             raise Exception
 
         self._add_row(new_record)
-
-if __name__=='__main__':
-    data_dir = os.path.abspath('../Data/Baseball')
-
-    csv_data_tbl = CSVDataTable(
-        'Appearances', {
-            'directory': data_dir,
-            'file_name': 'Appearances.csv'
-        }, [
-            'playerID',
-            'teamID',
-            'yearID'
-        ]
-    )
-
-    csv_data_tbl.insert({'yearID': '2015', 'teamID': 'ABC', 'lgID': 'NL', 'playerID': 'aardsda01', 'G_all': '33', 'GS': '0', 'G_batting': '30', 'G_defense': '33', 'G_p': '33', 'G_c': '0', 'G_1b': '0', 'G_2b': '0', 'G_3b': '0', 'G_ss': '0', 'G_lf': '0', 'G_cf': '0', 'G_rf': '0', 'G_of': '0', 'G_dh': '0', 'G_ph': '0', 'G_pr': '0'})
-
-    # print('Created table = ' + str(csv_data_tbl))
-
-    # List of questions for TA
-    # - I know that this has been discussed several times, but just to make sure that all all attributes are treated as string or plain text right?
-    # - Confusion for by_key methods, do we accept list of key values or template? I've read Piazza and come to conclusion that it should be list of key values. Just need to reconfirm.
-    # - Can we assume no two rows have the same set of primary keys so that for delete_by_key and update_by_key we always return either 0 or 1?
-    # - Corner cases? e.g. key_fields, field_list, template or new_values is None or empty. Do we assume ourselves?
-    # e.g. if key_fields or template is empty for find function, we return all rows (like select all)
-    # - How to test save function? -> no need
-    # - How to construct unit test -> Any specified format -> seems that this is loose
-    # https://piazza.com/class/jy3jm0i73f8584?cid=71
-    # - Prof. mentions that we should use Batting, People and Appearance data as toy database. Should we create unit test on all those data?
-    # - Should I cover all cases? Can I use pytest? It makes me easier to track test coverage
