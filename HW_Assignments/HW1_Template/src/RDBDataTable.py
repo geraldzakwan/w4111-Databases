@@ -72,14 +72,6 @@ class RDBDataTable(BaseDataTable):
 
         return field_list_string
 
-    # Build a template which contains key columns and their value from key_fields
-    def _convert_key_fields_to_template(self, key_fields):
-        template = {}
-        for i in range(0, len(self._data['key_columns'])):
-            template[self._data['key_columns'][i]] = key_fields[i]
-
-        return template
-
     def find_by_primary_key(self, key_fields, field_list=None):
         '''
 
@@ -92,11 +84,11 @@ class RDBDataTable(BaseDataTable):
             print('Table has no primary keys')
             raise Exception
 
-        if Helper.are_key_fields_valid(key_fields, self._data['key_columns']):
+        if not Helper.are_key_fields_valid(key_fields, self._data['key_columns']):
             print('Key fields are not valid')
             raise Exception
 
-        template = self._convert_key_fields_to_template(key_fields)
+        template = Helper.convert_key_fields_to_template(key_fields, self._data['key_columns'])
         ret_list = self.find_by_template(template, field_list)
 
         if len(ret_list) == 0:
@@ -116,6 +108,9 @@ class RDBDataTable(BaseDataTable):
         '''
         template_string = ''
         if not Helper.is_empty(template):
+            if not Helper.is_template_valid(template):
+                print('Some columns in the specified template don\'t match table columns')
+                raise Exception
             template_string = 'WHERE ' + self._compose_template_string(template)
 
         if Helper.is_empty(field_list):
@@ -148,11 +143,11 @@ class RDBDataTable(BaseDataTable):
             print('Table has no primary keys')
             raise Exception
 
-        if Helper.are_key_fields_valid(key_fields, self._data['key_columns']):
+        if not Helper.are_key_fields_valid(key_fields, self._data['key_columns']):
             print('Key fields are not valid')
             raise Exception
 
-        template = self._convert_key_fields_to_template(key_fields)
+        template = Helper.convert_key_fields_to_template(key_fields, self._data['key_columns'])
         return self.delete_by_template(template)
 
     def delete_by_template(self, template):
@@ -163,6 +158,9 @@ class RDBDataTable(BaseDataTable):
         '''
         template_string = ''
         if not Helper.is_empty(template):
+            if not Helper.is_template_valid(template):
+                print('Some columns in the specified template don\'t match table columns')
+                raise Exception
             template_string = 'WHERE ' + self._compose_template_string(template)
 
         query = 'DELETE FROM ' + '`' + self._data['table_name'] + '` ' + template_string
@@ -195,7 +193,7 @@ class RDBDataTable(BaseDataTable):
         if Helper.is_empty(new_values):
             return 0
 
-        template = self._convert_key_fields_to_template(key_fields)
+        template = Helper.convert_key_fields_to_template(key_fields, self._data['key_columns'])
         return self.update_by_template(template, new_values)
 
     def update_by_template(self, template, new_values):
@@ -210,6 +208,9 @@ class RDBDataTable(BaseDataTable):
 
         template_string = ''
         if not Helper.is_empty(template):
+            if not Helper.is_template_valid(template):
+                print('Some columns in the specified template don\'t match table columns')
+                raise Exception
             template_string = 'WHERE ' + self._compose_template_string(template)
 
         update_string = ''

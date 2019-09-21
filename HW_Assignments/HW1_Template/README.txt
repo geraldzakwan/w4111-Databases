@@ -32,9 +32,11 @@ Specific to CSVDataTable implementation
 
     - I also do primary key checking on update
 
-    - I never reuse by_template function for by_key function. For example, I don't use find_by_template to implement
-    find_by_key because it's a lot more efficient to just implement them separately. For find_by_key, you can stop search
-    after getting the matching row, with the assumption that primary key constraint is not violated when the first dataset is loaded.
+    - I implement the limit param in find_by_template so I can use that for find_by_primary_key by setting the limit to 1.
+    Thus, you can stop search after getting the first matching row, with the assumption that primary key constraint
+    is not violated when the first dataset is loaded. So, it is more efficient.
+
+    - I also do the same for delete and update (using limit param so I can reuse the _by_template functions efficiently)
 
     - Saving
 
@@ -42,6 +44,13 @@ Specific to CSVDataTable implementation
     If set to true, it will always call save function after insert/update/delete
 
     - Parameter validation
+
+    Did params validation for template, field_list, etc. If columns don't match throws exception
+
+    - More than one rows checking
+
+    I use compare_two_list_of_dicts function because sometimes the elements order in the returned list of find_by_template
+    can be different from the elements order in the returned list if we query using SQL
 
 Specific to RDBDataTable implementation
 

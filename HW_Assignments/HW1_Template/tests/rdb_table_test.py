@@ -65,7 +65,7 @@ def test_find_by_template(appearances_rdb):
     # Example when some rows matches the template but no field_list is provided
     # All the fields are returned in this case, this mimics the database behavior of SELECT *
     label = [{'yearID': '2004', 'teamID': 'BOS', 'lgID': 'AL', 'playerID': 'millake01', 'G_all': '150', 'GS': '140', 'G_batting': '150', 'G_defense': '137', 'G_p': '0', 'G_c': '0', 'G_1b': '69', 'G_2b': '0', 'G_3b': '0', 'G_ss': '0', 'G_lf': '20', 'G_cf': '0', 'G_rf': '55', 'G_of': '74', 'G_dh': '8', 'G_ph': '7', 'G_pr': '0'}, {'yearID': '1963', 'teamID': 'HOU', 'lgID': 'NL', 'playerID': 'staubru01', 'G_all': '150', 'GS': '140', 'G_batting': '150', 'G_defense': '144', 'G_p': '0', 'G_c': '0', 'G_1b': '109', 'G_2b': '0', 'G_3b': '0', 'G_ss': '0', 'G_lf': '0', 'G_cf': '0', 'G_rf': '49', 'G_of': '49', 'G_dh': '0', 'G_ph': '7', 'G_pr': '1'}, {'yearID': '2015', 'teamID': 'SLN', 'lgID': 'NL', 'playerID': 'wongko01', 'G_all': '150', 'GS': '140', 'G_batting': '150', 'G_defense': '147', 'G_p': '0', 'G_c': '0', 'G_1b': '0', 'G_2b': '147', 'G_3b': '0', 'G_ss': '0', 'G_lf': '0', 'G_cf': '0', 'G_rf': '0', 'G_of': '0', 'G_dh': '0', 'G_ph': '7', 'G_pr': '0'}]
-    assert appearances_rdb.find_by_template({'G_all': '150', 'GS': '140', 'G_ph': '7'}), label
+    assert appearances_rdb.find_by_template({'G_all': '150', 'GS': '140', 'G_ph': '7'}) == label
 
     # No rows match the template, returning an empty list
     assert appearances_rdb.find_by_template({'G_all': '123', 'GS': '250'}, ['playerID', 'yearID']) == []
@@ -151,7 +151,7 @@ def test_update_by_key(appearances_rdb):
         appearances_rdb.update_by_key(['1', '2'], {})
 
     # Function directly returns zero if new_values is None or empty, as nothing to update
-    appearances_rdb.update_by_key(['aardsda01', 'ATL', '2015'], {}) == 0
+    # appearances_rdb.update_by_key(['aardsda01', 'ATL', '2015'], {}) == 0
 
     # Example when a row matches the set of primary keys and it updates based on template
     # Count records that match a specific template
