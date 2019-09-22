@@ -15,6 +15,7 @@ This README consists of three parts:
         - I have confirmed with Kiran (one of the TAs) that I can use pytest library.
         - I use the Appearances.csv and Appearances table in MySQL for the test cases.
         - Primary keys are `playerID`, `teamID` and `yearID` as Prof. Ferguson explained in the class.
+        - I don't use unit_tests.py as several TAs in Piazza state that it isn't necessary.
 
 2. Assumptions
     a. Some general assumptions (apply for CSV & RDB data table):
