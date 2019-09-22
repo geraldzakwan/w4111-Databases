@@ -1,11 +1,11 @@
-(venv) Kartikos-MBP:HW1_Template kartiko$ pytest tests/rdb_table_test.py --cov=src.RDBDataTable --cov-report term-missing
+(venv) Kartikos-MBP:HW1_Template kartiko$ pytest tests/rdb_table_tests.py --cov=src.RDBDataTable --cov-report term-missing
 ============================= test session starts ==============================
 platform darwin -- Python 3.5.4, pytest-3.9.1, py-1.7.0, pluggy-0.8.0
-rootdir: /Users/kartiko/iCloud Drive (Archive)/Desktop/workspace/columbia/intro_to_db/w4111-Databases/HW_Assignments/HW1_Template, inifile:
+rootdir: /Users/kartiko/iCloud Drive (Archive)/Desktop/workspace/columbia/intro_to_db/HW1_Template, inifile:
 plugins: cov-2.6.0
-collected 8 items
+collected 8 items                                                              
 
-tests/rdb_table_test.py ........                                         [100%]
+tests/rdb_table_tests.py ........                                        [100%]
 
 ---------- coverage: platform darwin, python 3.5.4-final-0 -----------
 Name                  Stmts   Miss  Cover   Missing
@@ -13,5 +13,5 @@ Name                  Stmts   Miss  Cover   Missing
 src/RDBDataTable.py     161      8    95%   46, 49, 175, 177-179, 230, 261
 
 
-========================== 8 passed in 13.79 seconds ===========================
-(venv) Kartikos-MBP:HW1_Template kartiko$
+========================== 8 passed in 13.92 seconds ===========================
+(venv) Kartikos-MBP:HW1_Template kartiko$ 
