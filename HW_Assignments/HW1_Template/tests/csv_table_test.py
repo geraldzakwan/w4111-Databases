@@ -209,16 +209,16 @@ def test_no_primary_key(appearances_csv):
     # All by_key methods should fail if table has no primary keys
     appearances_csv._data['key_columns'] = None
     with pytest.raises(Exception):
-        assert appearances_csv.find_by_primary_key(None) == None
+        assert appearances_csv.find_by_primary_key(None)
     with pytest.raises(Exception):
-        assert appearances_csv.delete_by_key(None) == 0
+        assert appearances_csv.delete_by_key(None)
     with pytest.raises(Exception):
-        assert appearances_csv.update_by_key(None, []) == 0
+        assert appearances_csv.update_by_key(None, [])
 
     appearances_csv._data['key_columns'] = []
     with pytest.raises(Exception):
-        assert appearances_csv.find_by_primary_key([]) == None
+        assert appearances_csv.find_by_primary_key([])
     with pytest.raises(Exception):
-        assert appearances_csv.delete_by_key([]) == 0
+        assert appearances_csv.delete_by_key([])
     with pytest.raises(Exception):
-        assert appearances_csv.update_by_key([], []) == 0
+        assert appearances_csv.update_by_key([], [])

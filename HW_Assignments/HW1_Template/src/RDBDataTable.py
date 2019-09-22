@@ -10,7 +10,7 @@ class RDBDataTable(BaseDataTable):
     base class and implement the abstract methods.
     '''
 
-    def __init__(self, table_name, connect_info, key_columns, auto_commit=False):
+    def __init__(self, table_name, connect_info, key_columns, auto_commit=True):
         '''
 
         :param table_name: Logical name of the table.

@@ -6,6 +6,7 @@ import logging
 import json
 import os
 # I don't use pandas, I just leave it as is from the starter code
+# For RDBDataTable, I don't implement the __str__ func and don't use pandas
 import pandas as pd
 
 pd.set_option("display.width", 256)
@@ -110,13 +111,14 @@ class CSVDataTable(BaseDataTable):
                 i = i + 1
 
         if not Helper.is_empty(self._data['key_columns']):
-            if not self._check_primary_key_constraint():
+            if not self._check_primary_key_constraint_for_first_load():
+                self._rows = []
                 self._logger.error('The specified primary keys don\'t comply with primary key constraint')
                 raise Exception
 
         self._logger.debug('CSVDataTable._load: Loaded ' + str(len(self._rows)) + ' rows')
 
-    def _check_primary_key_constraint(self):
+    def _check_primary_key_constraint_for_first_load(self):
         list_of_key_values_tuple = []
         for row in self.get_rows():
             key_values = []
@@ -154,6 +156,9 @@ class CSVDataTable(BaseDataTable):
             raise Exception
 
     def _violate_primary_key_constraint(self, new_keys_template):
+        if Helper.is_empty(self._data['key_columns']):
+            return False
+
         key_fields = Helper.extract_key_fields_from_template(new_keys_template, self._data['key_columns'])
 
         records = self.find_by_primary_key(key_fields)

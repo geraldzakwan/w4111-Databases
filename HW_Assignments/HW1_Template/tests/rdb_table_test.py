@@ -16,7 +16,8 @@ def appearances_rdb():
             'playerID',
             'teamID',
             'yearID'
-        ]
+        ],
+        False
     )
 
 def test_find_by_primary_key(appearances_rdb):
@@ -204,19 +205,19 @@ def test_no_primary_key(appearances_rdb):
     # All by_key methods should fail if table has no primary keys
     appearances_rdb._data['key_columns'] = None
     with pytest.raises(Exception):
-        assert appearances_rdb.find_by_primary_key(None) == None
+        assert appearances_rdb.find_by_primary_key(None)
     with pytest.raises(Exception):
-        assert appearances_rdb.delete_by_key(None) == 0
+        assert appearances_rdb.delete_by_key(None)
     with pytest.raises(Exception):
-        assert appearances_rdb.update_by_key(None, []) == 0
+        assert appearances_rdb.update_by_key(None, [])
 
     appearances_rdb._data['key_columns'] = []
     with pytest.raises(Exception):
-        assert appearances_rdb.find_by_primary_key([]) == None
+        assert appearances_rdb.find_by_primary_key([])
     with pytest.raises(Exception):
-        assert appearances_rdb.delete_by_key([]) == 0
+        assert appearances_rdb.delete_by_key([])
     with pytest.raises(Exception):
-        assert appearances_rdb.update_by_key([], []) == 0
+        assert appearances_rdb.update_by_key([], [])
 
     appearances_rdb.close_connection()
     assert appearances_rdb.get_connection().open == False
