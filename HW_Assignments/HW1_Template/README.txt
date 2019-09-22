@@ -9,8 +9,8 @@ This README consists of three parts:
         - I don't use pandas library but since it is included in started code for CSVDataTable, I keep it as is
     b. If using PyCharm, set root to the folder above src and tests
     c. To run unit_test:
-        - pytest tests/csv_table_test.py --cov=src.CSVDataTable --cov-report term-missing
-        - pytest tests/rdb_table_test.py --cov=src.RDBDataTable --cov-report term-missing
+        - pytest tests/csv_table_tests.py --cov=src.CSVDataTable --cov-report term-missing
+        - pytest tests/rdb_table_tests.py --cov=src.RDBDataTable --cov-report term-missing
     d. Detail on test:
         - I have confirmed with Kiran (one of the TAs) that I can use pytest library.
         - I use the Appearances.csv and Appearances table in MySQL for the test cases.
