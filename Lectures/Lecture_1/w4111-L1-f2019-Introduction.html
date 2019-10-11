@@ -11767,6 +11767,52 @@ div#notebook {
     });
     </script>
     <!-- End of mathjax configuration --></head>
+
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.css">
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js"></script>
+
+<link rel="stylesheet" type="text/css" href="https://rawgit.com/ipython-contrib/jupyter_contrib_nbextensions/master/src/jupyter_contrib_nbextensions/nbextensions/toc2/main.css">
+
+<style type="text/css">
+@font-face {
+    font-family: 'FontAwesome';
+    src: url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/fonts/fontawesome-webfont.eot');
+    src: url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/fonts/fontawesome-webfont.eot?#iefix') format('embedded-opentype'),
+         url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/fonts/fontawesome-webfont.woff') format('woff'),
+         url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/fonts/fontawesome-webfont.ttf') format('truetype'),
+         url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/fonts/fontawesome-webfont.svg#fontawesomeregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+</style>
+
+<script src="https://rawgit.com/ipython-contrib/jupyter_contrib_nbextensions/master/src/jupyter_contrib_nbextensions/nbextensions/toc2/toc2.js"></script>
+
+<script>
+$( document ).ready(function(){
+
+            var cfg={'threshold':3,     // depth of toc (number of levels)
+             'number_sections': true,  // sections numbering
+             'toc_cell': false,          // useless here
+             'toc_window_display': true, // display the toc window
+             "toc_section_display": "block", // display toc contents in the window
+             'markTocItemOnScroll': false, 
+             'sideBar':true,             // sidebar or floating window
+             'navigate_menu':false,       // navigation menu (only in liveNotebook -- do not change)
+              title_cell: 'Table of Contents',
+              title_sidebar: 'Contents',
+            }
+
+            var st={};                  // some variables used in the script
+            st.oldTocHeight = undefined
+
+            // fire the main function with these parameters
+            require(['nbextensions/toc2/toc2'], function (toc2) {
+                toc2.table_of_contents(cfg, st);
+            });
+    });
+</script>
 <body>
   <div tabindex="-1" id="notebook" class="border-box-sizing">
     <div class="container" id="notebook-container">
@@ -20216,6 +20262,7 @@ The methods and properties are:  [
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
+<p><strong>Note to Instructor:</strong> Cover in lecture 2. Skipped in lecture 1.</p>
 <ul>
 <li>There are many, many, many different kinds of database management systems. The differences are:<ul>
 <li>Type of data: tables, documents, images, complex design models, ...</li>
@@ -20287,6 +20334,7 @@ The methods and properties are:  [
 </tr>
 </tbody>
 </table>
+<p><strong>Note to Instructor:</strong>(End) Cover in lecture 2. Skipped in lecture 1.</p>
 
 </div>
 </div>
@@ -20317,7 +20365,8 @@ The methods and properties are:  [
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h4 id="DBMS-Functions">DBMS Functions<a class="anchor-link" href="#DBMS-Functions">&#182;</a></h4><hr style="height:1px;">
+<h4 id="DBMS-Functions">DBMS Functions<a class="anchor-link" href="#DBMS-Functions">&#182;</a></h4><p><strong>Note to Instructor:</strong> Cover in lecture 2. Skipped in lecture 1.</p>
+<hr style="height:1px;">
 
 <table>
 <thead><tr>
@@ -21561,6 +21610,7 @@ tasklist.exe                 15564 Console                    1     10,304 K Unk
 <ul>
 <li>Cool. What does this have to do with databases?</li>
 </ul>
+<p><strong>Note to Instructor:</strong>(End) Cover in lecture 2. Skipped in lecture 1.</p>
 <ul>
 <li><strong>Ignore the following wizard stuff.</strong></li>
 </ul>
@@ -22084,6 +22134,7 @@ order by no_students desc;
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
+<p><strong>Note to Instructor:</strong> Cover in lecture 2. Skipped in lecture 1.</p>
 <ul>
 <li>But seriously, ...</li>
 </ul>
@@ -22119,6 +22170,7 @@ order by no_students desc;
 </ul>
 </li>
 </ul>
+<p><strong>Note to Instructor:</strong>(End) Cover in lecture 2. Skipped in lecture 1.</p>
 
 </div>
 </div>
@@ -22415,6 +22467,7 @@ It is a big, honking set of linked databases.</li>
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
+<p><strong>Note to Instructor:</strong>Cover in lecture 2. Skipped in lecture 1.</p>
 <h2 id="Introduction-to-The-Relational-Model-and-SQL">Introduction to The Relational Model and SQL<a class="anchor-link" href="#Introduction-to-The-Relational-Model-and-SQL">&#182;</a></h2><h3 id="Introduction">Introduction<a class="anchor-link" href="#Introduction">&#182;</a></h3><hr style="height:1px;">
 
 <table>
@@ -25581,6 +25634,7 @@ by Hector Garcia-Molina (Author), Jeffrey D. Ullman (Author), Jennifer Wido
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
+<p><strong>Note to Instructor:</strong>(End) Cover in lecture 2. Skipped in lecture 1.</p>
 <h1 id="Homework-1">Homework 1<a class="anchor-link" href="#Homework-1">&#182;</a></h1><p><strong>The moment you have all been dreading!</strong></p>
 
 </div>
@@ -26186,7 +26240,7 @@ ablesha01,1883,10,4,USA,TX,Terrell,1951,2,8,USA,TX,San Antonio,Harry,Ables,Harry
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[99]:</div>
+<div class="prompt input_prompt">In&nbsp;[1]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">csv</span>
@@ -26208,16 +26262,47 @@ ablesha01,1883,10,4,USA,TX,Terrell,1951,2,8,USA,TX,San Antonio,Harry,Ables,Harry
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[100]:</div>
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">file_dir</span> <span class="o">=</span> <span class="s2">&quot;C:</span><span class="se">\\</span><span class="s2">Users</span><span class="se">\\</span><span class="s2">dferguso</span><span class="se">\\</span><span class="s2">ansys_one_drive</span><span class="se">\\</span><span class="s2">Columbia\Projects</span><span class="se">\\</span><span class="s2">W4111</span><span class="se">\\</span><span class="s2">HW1Impl</span><span class="se">\\</span><span class="s2">Data&quot;</span> <span class="o">+</span> \
-            <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">baseballdatabank-2019.2</span><span class="se">\\</span><span class="s2">core</span><span class="se">\\</span><span class="s2">&quot;</span>   
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">file_dir</span> <span class="o">=</span> <span class="s2">&quot;   </span>
 <span class="n">fn</span> <span class="o">=</span> <span class="n">file_dir</span> <span class="o">+</span> <span class="s2">&quot;People&quot;</span> <span class="o">+</span> <span class="s2">&quot;.csv&quot;</span>
 <span class="n">rows</span> <span class="o">=</span> <span class="n">load_csv_file</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
 </pre></div>
 
 </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_text output_error">
+<pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">FileNotFoundError</span>                         Traceback (most recent call last)
+<span class="ansi-green-fg">&lt;ipython-input-2-07975664cb02&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span><span class="ansi-blue-fg">()</span>
+<span class="ansi-green-intense-fg ansi-bold">      1</span> file_dir <span class="ansi-blue-fg">=</span> <span class="ansi-blue-fg">&#34;C:\\Users\\dferguso\\ansys_one_drive\\Columbia\Projects\\W4111\\HW1Impl\\Data&#34;</span> <span class="ansi-blue-fg">+</span>             <span class="ansi-blue-fg">&#34;\\baseballdatabank-2019.2\\core\\&#34;</span>
+<span class="ansi-green-intense-fg ansi-bold">      2</span> fn <span class="ansi-blue-fg">=</span> file_dir <span class="ansi-blue-fg">+</span> <span class="ansi-blue-fg">&#34;People&#34;</span> <span class="ansi-blue-fg">+</span> <span class="ansi-blue-fg">&#34;.csv&#34;</span>
+<span class="ansi-green-fg">----&gt; 3</span><span class="ansi-red-fg"> </span>rows <span class="ansi-blue-fg">=</span> load_csv_file<span class="ansi-blue-fg">(</span>fn<span class="ansi-blue-fg">)</span>
+
+<span class="ansi-green-fg">&lt;ipython-input-1-d59693ed83ee&gt;</span> in <span class="ansi-cyan-fg">load_csv_file</span><span class="ansi-blue-fg">(fn)</span>
+<span class="ansi-green-intense-fg ansi-bold">      3</span> <span class="ansi-green-fg">def</span> load_csv_file<span class="ansi-blue-fg">(</span>fn<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">      4</span>     result <span class="ansi-blue-fg">=</span> <span class="ansi-blue-fg">[</span><span class="ansi-blue-fg">]</span>
+<span class="ansi-green-fg">----&gt; 5</span><span class="ansi-red-fg">     </span><span class="ansi-green-fg">with</span> open<span class="ansi-blue-fg">(</span>fn<span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">&#34;r&#34;</span><span class="ansi-blue-fg">)</span> <span class="ansi-green-fg">as</span> in_file<span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">      6</span>         csv_file <span class="ansi-blue-fg">=</span> csv<span class="ansi-blue-fg">.</span>DictReader<span class="ansi-blue-fg">(</span>in_file<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">      7</span>         <span class="ansi-green-fg">for</span> r <span class="ansi-green-fg">in</span> csv_file<span class="ansi-blue-fg">:</span>
+
+<span class="ansi-red-fg">FileNotFoundError</span>: [Errno 2] No such file or directory: &#39;C:\\Users\\dferguso\\ansys_one_drive\\Columbia\\Projects\\W4111\\HW1Impl\\Data\\baseballdatabank-2019.2\\core\\People.csv&#39;</pre>
+</div>
+</div>
+
 </div>
 </div>
 
