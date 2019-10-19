@@ -39,9 +39,16 @@ class RDBDataTable():
     # specific connection on object creation.
     #
     # NOTE: You may just use the default connector if you want.
+    # _default_connect_info = {
+    #     'host': 'localhost',
+    #     'user': 'root',
+    #     'password': 'dbuserdbuser',
+    #     'db': 'lahman2019clean',
+    #     'port': 3306
+    # }
     _default_connect_info = {
         'host': 'localhost',
-        'user': 'root',
+        'user': 'dbuser',
         'password': 'dbuserdbuser',
         'db': 'lahman2019clean',
         'port': 3306
@@ -96,7 +103,8 @@ class RDBDataTable():
         self._key_columns = None
         self._sample_rows = None
         self._related_resources = None
-        self_columns = None
+        # NOTE: I think self_columns is a typo so I change it into self._columns
+        self._columns = None
 
 
         """
@@ -149,6 +157,7 @@ class RDBDataTable():
             print('Failed to fetch row counts')
             return None
 
+        self._row_count = data[0]['COUNT(*)']
         return data[0]['COUNT(*)']
 
     def get_primary_key_columns(self):
@@ -169,11 +178,12 @@ class RDBDataTable():
             print('Failed to fetch row counts')
             return None
 
-        list_of_primary_keys = []
+        list_of_key_columns = []
         for elem in data:
-            list_of_primary_keys.append(elem['Column_name'])
+            list_of_key_columns.append(elem['Column_name'])
 
-        return list_of_primary_keys
+        self._key_columns = list_of_key_columns
+        return list_of_key_columns
 
     def get_sample_rows(self, no_of_rows=_rows_to_print):
         """
@@ -193,7 +203,8 @@ class RDBDataTable():
         # -- THANK ALY AND ARA --
         # Aly and Ara told me to get rid of this requirement or they would be unhappy.
         #
-        pass
+        # pass
+        return None
 
     def get_links(self, target_table = None):
 
@@ -201,7 +212,8 @@ class RDBDataTable():
         # -- THANK ALY AND ARA --
         # Aly and Ara told me to get rid of this requirement or they would be unhappy.
         #
-        pass
+        # pass
+        return None
 
     ####################################################################################################
     #

@@ -54,7 +54,7 @@ def get_databases():
 
     # -- TO IMPLEMENT --
     # Design decision: Return only what's cached
-    # Needs to later add all accessed tables to this cache
+    # Needs to later add all accessed tables to this _db_tables cache
 
     global _db_tables
 
@@ -66,8 +66,28 @@ def get_databases():
 
     return list_of_databases
 
-if __name__=='__main__':
-    pass
+
+def get_tables(dbname):
+    """
+
+    :param dbname: The name of a database/schema
+    :return: List of tables in the database.
+    """
+
+    # -- TO IMPLEMENT --
+    # Design decision: Return only what's cached
+
+    global _db_tables
+
+    list_of_tables = []
+
+    for key in _db_tables:
+        database_name, table_name = key.split('.')
+
+        if database_name == dbname:
+            list_of_tables.append(table_name)
+
+    return list_of_tables
 
 
 

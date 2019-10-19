@@ -185,28 +185,38 @@ def dbs():
     """
     # -- TO IMPLEMENT --
 
+    inputs = log_and_extract_input(dbs, None)
+
     # Your code  goes here.
 
     # Hint: Implement the function in data_table_adaptor
-    #
+    # NOTE: I'm using get_databases() function for this
 
+    rsp_data = tuple(dta.get_databases())
+    rsp_str = json.dumps(rsp_data)
+    rsp = Response(rsp_str, status=200, content_type="application/json")
+    return rsp
 
 
 @application.route("/api/databases/<dbname>", methods=["GET"])
 def tbls(dbname):
     """
 
-    :param dbname: The name of a database/sche,a
+    :param dbname: The name of a database/schema
     :return: List of tables in the database.
     """
 
-    inputs = log_and_extract_input(dbs, None)
+    inputs = log_and_extract_input(tbls, (dbname))
 
     # Your code  goes here.
 
     # Hint: Implement the function in data_table_adaptor
-    #
+    # NOTE: I'm using get_databases() function for this
 
+    rsp_data = tuple(dta.get_tables(dbname))
+    rsp_str = json.dumps(rsp_data)
+    rsp = Response(rsp_str, status=200, content_type="application/json")
+    return rsp
 
 @application.route('/api/<dbname>/<resource>/<primary_key>', methods=['GET', 'PUT', 'DELETE'])
 def resource_by_id(dbname, resource, primary_key):
@@ -229,13 +239,23 @@ def resource_by_id(dbname, resource, primary_key):
         #
         # -- TO IMPLEMENT --
 
+        # Get our rdb_data_table and at the same time cache it if it doesn't exist yet
+        rdb_data_table = dta.get_rdb_table(resource, dbname)
+
+        key_fields = primary_key.split('_')
+        print(key_fields)
+
         if request.method == 'GET':
 
             #
             # SOME CODE GOES HERE
             #
             # -- TO IMPLEMENT --
-            pass
+            rsp_data = rdb_data_table.find_by_primary_key(key_fields)
+            # To accommodate for datetime format, set the default to string
+            rsp_str = json.dumps(rsp_data, default=str)
+            rsp = Response(rsp_str, status=200, content_type="application/json")
+            return rsp
 
         elif request.method == 'DELETE':
             #

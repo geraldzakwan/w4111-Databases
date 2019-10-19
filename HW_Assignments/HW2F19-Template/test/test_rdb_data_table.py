@@ -6,14 +6,7 @@ import pytest
 def appearances_rdb():
     return RDBDataTable(
         'appearances',
-        'lahman2019clean',
-        connect_info={
-            'host': 'localhost',
-            'user': 'dbuser',
-            'password': 'dbuserdbuser',
-            'db': 'lahman2019clean',
-            'port': 3306
-        }
+        'lahman2019clean'
     )
 
 def test_get_row_count(appearances_rdb):
