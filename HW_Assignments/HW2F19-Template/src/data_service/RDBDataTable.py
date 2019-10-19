@@ -69,6 +69,11 @@ class RDBDataTable():
         # You can use the default.
         if connect_info is None:
             self._connect_info = RDBDataTable._default_connect_info
+        else:
+            # NOTE: I move this self._connect_info initialization upward otherwise it doesn't make sense
+            # It will result in an error if we don't use the default connect_info since it will be None
+            # and it will be referred when calling pymysql.connect below
+            self._connect_info = connect_info
 
         # Create a connection to use inside this object. In general, this is not the right approach.
         # There would be a connection pool shared across many classes and applications.
@@ -87,7 +92,6 @@ class RDBDataTable():
         self._table_name = table_name
         self._full_table_name = db_name + "." + table_name
 
-        self._connect_info = connect_info
         self._row_count = None
         self._key_columns = None
         self._sample_rows = None
@@ -138,6 +142,15 @@ class RDBDataTable():
 
         # Hint. Google "get primary key columns mysql"
         # Hint. THE ORDER OF THE COLUMNS IN THE KEY DEFINITION MATTERS.
+
+        sql, args = ('SHOW KEYS FROM ' + self._full_table_name + ' WHERE Key_name = %s', ('PRIMARY'))
+        res, data = dbutils.run_q(sql, args=args, conn=self._cnx)
+
+        list_of_primary_keys = []
+        for elem in data:
+            list_of_primary_keys.append(elem['Column_name'])
+
+        return list_of_primary_keys
 
     def get_sample_rows(self, no_of_rows=_rows_to_print):
         """
@@ -316,3 +329,17 @@ class RDBDataTable():
         #
         pass
 
+if __name__=='__main__':
+    rdb_data_table = RDBDataTable(
+        'appearances',
+        'lahman2019clean',
+        connect_info = {
+            'host': 'localhost',
+            'user': 'dbuser',
+            'password': 'dbuserdbuser',
+            'db': 'lahman2019clean',
+            'port': 3306
+        }
+    )
+
+    print(rdb_data_table.get_primary_key_columns())

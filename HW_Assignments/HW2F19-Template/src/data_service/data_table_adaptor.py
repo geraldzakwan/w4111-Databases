@@ -53,6 +53,20 @@ def get_databases():
     """
 
     # -- TO IMPLEMENT --
+    # Design decision: Return only what's cached
+    # Needs to later add all accessed tables to this cache
+
+    global _db_tables
+
+    list_of_databases = []
+
+    for key in _db_tables:
+        database_name = key.split('.')[0]
+        list_of_databases.append(database_name)
+
+    return list_of_databases
+
+if __name__=='__main__':
     pass
 
 
