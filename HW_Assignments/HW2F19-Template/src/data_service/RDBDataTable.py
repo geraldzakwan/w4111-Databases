@@ -365,5 +365,3 @@ if __name__=='__main__':
         }
     )
 
-    assert rdb_data_table.get_primary_key_columns() == ['playerID', 'teamID', 'yearID']
-    assert rdb_data_table.get_row_count() == 105793
