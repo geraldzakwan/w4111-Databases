@@ -18,3 +18,4 @@ HW_Assignments/HW1_Template/.idea/inspectionProfiles/
 *backup*
 *b1*
 venv/
+*__pycache__*
