@@ -124,6 +124,16 @@ class RDBDataTable():
 
         return result
 
+    @staticmethod
+    def is_empty(data):
+        if data is None:
+            return True
+
+        if len(data) == 0:
+            return True
+
+        return False
+
     def get_row_count(self):
         """
 
@@ -131,6 +141,15 @@ class RDBDataTable():
         """
 
         # -- TO IMPLEMENT --
+
+        sql, args = ('SELECT COUNT(*) FROM ' + self._full_table_name, ())
+        res, data = dbutils.run_q(sql, args=args, conn=self._cnx)
+
+        if RDBDataTable.is_empty(data):
+            print('Failed to fetch row counts')
+            return None
+
+        return data[0]['COUNT(*)']
 
     def get_primary_key_columns(self):
         """
@@ -145,6 +164,10 @@ class RDBDataTable():
 
         sql, args = ('SHOW KEYS FROM ' + self._full_table_name + ' WHERE Key_name = %s', ('PRIMARY'))
         res, data = dbutils.run_q(sql, args=args, conn=self._cnx)
+
+        if RDBDataTable.is_empty(data):
+            print('Failed to fetch row counts')
+            return None
 
         list_of_primary_keys = []
         for elem in data:
@@ -342,4 +365,5 @@ if __name__=='__main__':
         }
     )
 
-    print(rdb_data_table.get_primary_key_columns())
+    assert rdb_data_table.get_primary_key_columns() == ['playerID', 'teamID', 'yearID']
+    assert rdb_data_table.get_row_count() == 105793
