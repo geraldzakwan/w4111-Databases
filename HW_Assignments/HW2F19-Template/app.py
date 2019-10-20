@@ -115,6 +115,7 @@ def log_response(path, rsp):
 def get_field_list(inputs):
     return inputs.get('fields', None)
 
+
 def generate_success(rsp_str=None, msg=None):
     if rsp_str:
         return Response(rsp_str, status=200, content_type="application/json")
@@ -126,6 +127,7 @@ def generate_success(rsp_str=None, msg=None):
 
     return Response(rsp_str, status=200, content_type="application/json")
 
+
 def generate_resource_not_found(msg=None):
     if not msg:
         msg = 'General resource not found'
@@ -133,6 +135,7 @@ def generate_resource_not_found(msg=None):
     rsp_str = json.dumps({'msg': msg})
 
     return Response(rsp_str, status=404, content_type="application/json")
+
 
 def generate_invalid(ex=None, msg=None):
     if not msg:
@@ -144,6 +147,7 @@ def generate_invalid(ex=None, msg=None):
     rsp_str = json.dumps({'err_msg': msg + str(ex)})
 
     return Response(rsp_str, status=400, content_type="application/json")
+
 
 def generate_error(ex=None, msg=None):
     """
@@ -201,6 +205,7 @@ def demo(parameter):
     rsp = Response(json.dumps(msg), status=200, content_type="application/json")
     return rsp
 
+
 ####################################################################################################
 #
 # YOU HAVE TO COMPLETE THE IMPLEMENTATION OF THE FUNCTIONS BELOW.
@@ -214,7 +219,7 @@ def dbs():
     """
     # -- TO IMPLEMENT --
 
-    inputs = log_and_extract_input(dbs, None)
+    log_and_extract_input(dbs, None)
 
     # Your code  goes here.
 
@@ -222,9 +227,10 @@ def dbs():
     # NOTE: I'm using get_databases() function for this
 
     rsp_data = tuple(dta.get_databases())
+
     rsp_str = json.dumps(rsp_data)
-    rsp = Response(rsp_str, status=200, content_type="application/json")
-    return rsp
+
+    return Response(rsp_str, status=200, content_type="application/json")
 
 
 @application.route("/api/databases/<dbname>", methods=["GET"])
@@ -243,9 +249,12 @@ def tbls(dbname):
     # NOTE: I'm using get_tables() function for this
 
     rsp_data = tuple(dta.get_tables(dbname))
+
     rsp_str = json.dumps(rsp_data)
-    rsp = Response(rsp_str, status=200, content_type="application/json")
-    return rsp
+
+    return Response(rsp_str, status=200, content_type="application/json")
+
+
 
 @application.route('/api/<dbname>/<resource>/<primary_key>', methods=['GET', 'PUT', 'DELETE'])
 def resource_by_id(dbname, resource, primary_key):

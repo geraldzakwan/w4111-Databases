@@ -46,6 +46,7 @@ class RDBDataTable():
     #     'db': 'lahman2019clean',
     #     'port': 3306
     # }
+    # NOTE: I change the _default_connect_info to 'user': 'dbuser'
     _default_connect_info = {
         'host': 'localhost',
         'user': 'dbuser',
@@ -99,9 +100,9 @@ class RDBDataTable():
         self._table_name = table_name
         self._full_table_name = db_name + "." + table_name
 
-        self._row_count = None
-        self._key_columns = None
-        self._sample_rows = None
+        self._row_count = self.get_row_count()
+        self._key_columns = self.get_primary_key_columns()
+        self._sample_rows = self.get_sample_rows()
         self._related_resources = None
         # NOTE: I think self_columns is a typo so I change it into self._columns
         self._columns = None
@@ -110,11 +111,11 @@ class RDBDataTable():
         """
         You should implement these methods. See the implementation templates below.
         """
-        self.get_primary_key_columns()
-        self.get_row_count()
-        self.get_sample_rows()
-        # DFF Remove below.
-        self.get_related_resources()
+        # self.get_primary_key_columns()
+        # self.get_row_count()
+        # self.get_sample_rows()
+        # # DFF Remove below.
+        # self.get_related_resources()
 
     def __str__(self):
         """
@@ -158,8 +159,8 @@ class RDBDataTable():
             return None
 
         # NOTE: I'm not sure whether this function should return a value or set the object variable
-        # In this case, I do both
-        self._row_count = data[0]['COUNT(*)']
+        # In this case, I decide to just return a value and use this value to set the _row_count variable in __int__
+
         return data[0]['COUNT(*)']
 
     def get_primary_key_columns(self):
@@ -185,8 +186,8 @@ class RDBDataTable():
             list_of_key_columns.append(elem['Column_name'])
 
         # NOTE: I'm not sure whether this function should return a value or set the object variable
-        # In this case, I do both
-        self._key_columns = list_of_key_columns
+        # In this case, I decide to just return a value and use this value to set the _key_columns variable in __int__
+
         return list_of_key_columns
 
     def get_sample_rows(self, no_of_rows=_rows_to_print):
