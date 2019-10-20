@@ -46,6 +46,7 @@ def get_rdb_table(table_name, db_name, key_columns=None, connect_info=None):
 # -- TO IMPLEMENT --
 #########################################
 
+
 def get_databases():
     """
 
@@ -58,13 +59,13 @@ def get_databases():
 
     global _db_tables
 
-    list_of_databases = []
+    set_of_databases = set([])
 
     for key in _db_tables:
         database_name = key.split('.')[0]
-        list_of_databases.append(database_name)
+        set_of_databases.add(database_name)
 
-    return list_of_databases
+    return list(set_of_databases)
 
 
 def get_tables(dbname):
@@ -79,15 +80,25 @@ def get_tables(dbname):
 
     global _db_tables
 
-    list_of_tables = []
+    set_of_tables = set([])
 
     for key in _db_tables:
         database_name, table_name = key.split('.')
 
         if database_name == dbname:
-            list_of_tables.append(table_name)
+            set_of_tables.add(table_name)
 
-    return list_of_tables
+    return list(set_of_tables)
+
+# Some helper functions
+def is_empty(data):
+    if data is None:
+        return True
+
+    if len(data) == 0:
+        return True
+
+    return False
 
 
 

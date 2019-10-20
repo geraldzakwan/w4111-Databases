@@ -372,6 +372,10 @@ def get_resource(dbname, resource_name):
             print(exception)
             return generate_error(ex=exception, msg='Fetch by template fails: ')
 
+        if dta.is_empty(rsp_data):
+            msg = 'No entry with such template'
+            return generate_resource_not_found(msg=msg)
+
         # To accommodate for datetime format, set the default datetime to string
         rsp_str = json.dumps(rsp_data, default=str)
 
