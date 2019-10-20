@@ -90,7 +90,16 @@ def get_tables(dbname):
     return list_of_tables
 
 
+# Some helper functions
 
+def is_empty(data):
+    if data is None:
+        return True
+
+    if len(data) == 0:
+        return True
+
+    return False
 
 
 

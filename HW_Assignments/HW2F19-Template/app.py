@@ -211,7 +211,7 @@ def tbls(dbname):
     # Your code  goes here.
 
     # Hint: Implement the function in data_table_adaptor
-    # NOTE: I'm using get_databases() function for this
+    # NOTE: I'm using get_tables() function for this
 
     rsp_data = tuple(dta.get_tables(dbname))
     rsp_str = json.dumps(rsp_data)
@@ -242,16 +242,20 @@ def resource_by_id(dbname, resource, primary_key):
         # Get our rdb_data_table and at the same time cache it if it doesn't exist yet
         rdb_data_table = dta.get_rdb_table(resource, dbname)
 
+        # Split by '_' to get all the key fields
         key_fields = primary_key.split('_')
-        print(key_fields)
+
+        # Get field_list from context
+        field_list = get_field_list(context)
 
         if request.method == 'GET':
-
             #
             # SOME CODE GOES HERE
             #
             # -- TO IMPLEMENT --
-            rsp_data = rdb_data_table.find_by_primary_key(key_fields)
+
+            rsp_data = rdb_data_table.find_by_primary_key(key_fields, field_list)
+
             # To accommodate for datetime format, set the default to string
             rsp_str = json.dumps(rsp_data, default=str)
             rsp = Response(rsp_str, status=200, content_type="application/json")
@@ -262,14 +266,24 @@ def resource_by_id(dbname, resource, primary_key):
             # SOME CODE GOES HERE
             #
             # -- TO IMPLEMENT --
-            pass
+
+            rsp_data = rdb_data_table.delete_by_key(key_fields)
+            # To accommodate for datetime format, set the default to string
+            rsp_str = json.dumps(rsp_data)
+            rsp = Response(rsp_str, status=200, content_type="application/json")
+            return rsp
 
         elif request.method == 'PUT':
             #
             # SOME CODE GOES HERE
             #
             # -- TO IMPLEMENT --
-            pass
+
+            rsp_data = rdb_data_table.update_by_key(key_fields)
+            # To accommodate for datetime format, set the default to string
+            rsp_str = json.dumps(rsp_data)
+            rsp = Response(rsp_str, status=200, content_type="application/json")
+            return rsp
 
     except Exception as e:
         print(e)

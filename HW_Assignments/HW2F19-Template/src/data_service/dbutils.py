@@ -29,9 +29,9 @@ def run_q(sql, args=None, fetch=True, cur=None, conn=None, commit=True):
 
     This is a modification that better supports HW1. An RDBDataTable MUST have a connection specified by
     the connection information. This means that this implementation of run_q MUST NOT try to obtain
-    a defailt connection.
+    a default connection.
 
-    :param sql: SQL template with placeholders for parameters. Canno be NULL.
+    :param sql: SQL template with placeholders for parameters. Cannot be NULL.
     :param args: Values to pass with statement. May be null.
     :param fetch: Execute a fetch and return data if TRUE.
     :param conn: The database connection to use. This cannot be NULL, unless a cursor is passed.

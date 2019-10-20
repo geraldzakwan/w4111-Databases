@@ -132,16 +132,6 @@ class RDBDataTable():
 
         return result
 
-    @staticmethod
-    def is_empty(data):
-        if data is None:
-            return True
-
-        if len(data) == 0:
-            return True
-
-        return False
-
     def get_row_count(self):
         """
 
@@ -157,6 +147,8 @@ class RDBDataTable():
             print('Failed to fetch row counts')
             return None
 
+        # NOTE: I'm not sure whether this function should return a value or set the object variable
+        # In this case, I do both
         self._row_count = data[0]['COUNT(*)']
         return data[0]['COUNT(*)']
 
@@ -182,6 +174,8 @@ class RDBDataTable():
         for elem in data:
             list_of_key_columns.append(elem['Column_name'])
 
+        # NOTE: I'm not sure whether this function should return a value or set the object variable
+        # In this case, I do both
         self._key_columns = list_of_key_columns
         return list_of_key_columns
 
