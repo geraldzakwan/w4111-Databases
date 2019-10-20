@@ -115,7 +115,29 @@ def log_response(path, rsp):
 def get_field_list(inputs):
     return inputs.get('fields', None)
 
-def generate_error(status_code, ex=None, msg=None):
+def generate_success(rsp_str=None, msg=None):
+    if rsp_str:
+        return Response(rsp_str, status=200, content_type="application/json")
+
+    if not msg:
+        msg = 'General resource modification succeeds'
+
+    rsp_str = json.dumps({'msg': msg})
+
+    return Response(rsp_str, status=200, content_type="application/json")
+
+def generate_invalid(ex=None, msg=None):
+    if not msg:
+        msg = 'General invalid request'
+
+    if not ex:
+        ex = 'Unknown reason'
+
+    rsp_str = json.dumps({'err_msg': msg + str(ex)})
+
+    return Response(rsp_str, status=400, content_type="application/json")
+
+def generate_error(ex=None, msg=None):
     """
 
     This used to be more complicated in previous semesters, but we simplified for fall 2019.
@@ -125,16 +147,15 @@ def generate_error(status_code, ex=None, msg=None):
     :param msg:
     :return:
     """
+    if not msg:
+        msg = 'General internal server error'
 
-    rsp = Response("Oops", status=500, content_type="text/plain")
+    if not ex:
+        ex = 'Unknown reason'
 
-    if status_code == 500:
-        if msg is None:
-            msg = "INTERNAL SERVER ERROR. Please take COMSE6156 -- Cloud Native Applications."
+    rsp_str = json.dumps({'err_msg': msg + str(ex)})
 
-        rsp = Response(msg, status=status_code, content_type="text/plain")
-
-    return rsp
+    return Response(rsp_str, status=500, content_type="application/json")
 
 
 ####################################################################################################
@@ -292,37 +313,58 @@ def resource_by_id(dbname, resource, primary_key):
 
 @application.route('/api/<dbname>/<resource_name>', methods=['GET', 'POST'])
 def get_resource(dbname, resource_name):
+    context = log_and_extract_input(get_resource, (dbname, resource_name))
 
-    result = None
+    #
+    # SOME CODE GOES HERE
+    #
+    # -- TO IMPLEMENT --
 
-    try:
-        context = log_and_extract_input(get_resource, (dbname, resource_name))
+    # Get our rdb_data_table and at the same time cache it if it doesn't exist yet
+    rdb_data_table = dta.get_rdb_table(resource_name, dbname)
 
+    if request.method == 'GET':
         #
         # SOME CODE GOES HERE
         #
         # -- TO IMPLEMENT --
 
+        # Get template from query params
+        template = context['query_params']
 
-        if request.method == 'GET':
-            #
-            # SOME CODE GOES HERE
-            #
-            # -- TO IMPLEMENT --
-            pass
+        # Get field_list from context
+        field_list = get_field_list(context)
 
-        elif request.method == 'POST':
-            #
-            # SOME CODE GOES HERE
-            #
-            # -- TO IMPLEMENT --
-            pass
+        try:
+            rsp_data = rdb_data_table.find_by_template(template, field_list)
+        except Exception as exception:
+            print(exception)
+            return generate_error(ex=exception, msg='Fetch fails: ')
+
+        # To accommodate for datetime format, set the default datetime to string
+        rsp_str = json.dumps(rsp_data, default=str)
+
+        return generate_success(rsp_str=rsp_str)
+
+    elif request.method == 'POST':
+        #
+        # SOME CODE GOES HERE
+        #
+        # -- TO IMPLEMENT --
+        new_record = context['body']
+
+        try:
+            rsp_data = rdb_data_table.insert(new_record)
+        except Exception as exception:
+            print(exception)
+            return generate_error(ex=exception, msg='Insert fails: ')
+
+        if rsp_data == 1:
+            return generate_success(msg='Entry succesfully inserted')
         else:
-            result = "Invalid request."
-            return result, 400, {'Content-Type': 'text/plain; charset=utf-8'}
-    except Exception as e:
-        print("Exception e = ", e)
-        return handle_error(e, result)
+            return generate_error(msg='Insert fails: ')
+    else:
+        return generate_invalid()
 
 
 @application.route('/api/<dbname>/<parent_name>/<primary_key>/<target_name>', methods=['GET'])

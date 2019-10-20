@@ -132,6 +132,16 @@ class RDBDataTable():
 
         return result
 
+    @staticmethod
+    def is_empty(data):
+        if data is None:
+            return True
+
+        if len(data) == 0:
+            return True
+
+        return False
+
     def get_row_count(self):
         """
 
@@ -167,7 +177,7 @@ class RDBDataTable():
         res, data = dbutils.run_q(sql, args=args, conn=self._cnx)
 
         if RDBDataTable.is_empty(data):
-            print('Failed to fetch row counts')
+            print('Failed to fetch primary keys')
             return None
 
         list_of_key_columns = []
