@@ -248,68 +248,77 @@ def resource_by_id(dbname, resource, primary_key):
     :param primary_key: Primary key in the form "col1_col2_..._coln" with the values of key columns.
     :return: Result of operations.
     """
+    # Parse the incoming request into an application specific format.
+    context = log_and_extract_input(resource_by_id, (dbname, resource, primary_key))
 
-    result = None
+    #
+    # SOME CODE GOES HERE
+    #
+    # -- TO IMPLEMENT --
 
-    try:
-        # Parse the incoming request into an application specific format.
-        context = log_and_extract_input(resource_by_id, (dbname, resource, primary_key))
+    # Get our rdb_data_table and at the same time cache it if it doesn't exist yet
+    rdb_data_table = dta.get_rdb_table(resource, dbname)
 
+    # Split by '_' to get all the key fields
+    key_fields = primary_key.split('_')
+
+    if request.method == 'GET':
         #
         # SOME CODE GOES HERE
         #
         # -- TO IMPLEMENT --
 
-        # Get our rdb_data_table and at the same time cache it if it doesn't exist yet
-        rdb_data_table = dta.get_rdb_table(resource, dbname)
-
-        # Split by '_' to get all the key fields
-        key_fields = primary_key.split('_')
-
         # Get field_list from context
         field_list = get_field_list(context)
 
-        if request.method == 'GET':
-            #
-            # SOME CODE GOES HERE
-            #
-            # -- TO IMPLEMENT --
-
+        try:
             rsp_data = rdb_data_table.find_by_primary_key(key_fields, field_list)
+        except Exception as exception:
+            print(exception)
+            return generate_error(ex=exception, msg='Fetch by primary key fails: ')
 
-            # To accommodate for datetime format, set the default to string
-            rsp_str = json.dumps(rsp_data, default=str)
-            rsp = Response(rsp_str, status=200, content_type="application/json")
-            return rsp
+        # To accommodate for datetime format, set the default to string
+        rsp_str = json.dumps(rsp_data, default=str)
 
-        elif request.method == 'DELETE':
-            #
-            # SOME CODE GOES HERE
-            #
-            # -- TO IMPLEMENT --
+        return generate_success(rsp_str=rsp_str)
 
+    elif request.method == 'DELETE':
+        #
+        # SOME CODE GOES HERE
+        #
+        # -- TO IMPLEMENT --
+        try:
             rsp_data = rdb_data_table.delete_by_key(key_fields)
-            # To accommodate for datetime format, set the default to string
-            rsp_str = json.dumps(rsp_data)
-            rsp = Response(rsp_str, status=200, content_type="application/json")
-            return rsp
+        except Exception as exception:
+            print(exception)
+            return generate_error(ex=exception, msg='Delete by primary key fails: ')
 
-        elif request.method == 'PUT':
-            #
-            # SOME CODE GOES HERE
-            #
-            # -- TO IMPLEMENT --
+        return generate_success(msg='Rows deleted: ' + str(rsp_data))
 
-            rsp_data = rdb_data_table.update_by_key(key_fields)
-            # To accommodate for datetime format, set the default to string
-            rsp_str = json.dumps(rsp_data)
-            rsp = Response(rsp_str, status=200, content_type="application/json")
-            return rsp
+    elif request.method == 'PUT':
+        #
+        # SOME CODE GOES HERE
+        #
+        # -- TO IMPLEMENT --
+        new_values = context['body']
 
-    except Exception as e:
-        print(e)
-        return handle_error(e, result)
+        try:
+            rsp_data = rdb_data_table.update_by_key(key_fields, new_values)
+        except Exception as exception:
+            print(exception)
+            return generate_error(ex=exception, msg='Update by primary key fails: ')
 
+        if rsp_data == 0:
+            is_data_found = rdb_data_table.find_by_primary_key(key_fields)
+
+            if is_data_found:
+                msg = 'The entry is found but the new values given are the same as old values'
+            else:
+                msg = 'The entry is not found'
+        else:
+            msg = 'The entry is succesfully updated'
+
+        return Response(msg, status=200, content_type="application/json")
 
 @application.route('/api/<dbname>/<resource_name>', methods=['GET', 'POST'])
 def get_resource(dbname, resource_name):
@@ -339,7 +348,7 @@ def get_resource(dbname, resource_name):
             rsp_data = rdb_data_table.find_by_template(template, field_list)
         except Exception as exception:
             print(exception)
-            return generate_error(ex=exception, msg='Fetch fails: ')
+            return generate_error(ex=exception, msg='Fetch by template fails: ')
 
         # To accommodate for datetime format, set the default datetime to string
         rsp_str = json.dumps(rsp_data, default=str)
@@ -356,13 +365,9 @@ def get_resource(dbname, resource_name):
         try:
             rsp_data = rdb_data_table.insert(new_record)
         except Exception as exception:
-            print(exception)
             return generate_error(ex=exception, msg='Insert fails: ')
 
-        if rsp_data == 1:
-            return generate_success(msg='Entry succesfully inserted')
-        else:
-            return generate_error(msg='Insert fails: ')
+        return generate_success(msg='Entry succesfully inserted')
     else:
         return generate_invalid()
 
