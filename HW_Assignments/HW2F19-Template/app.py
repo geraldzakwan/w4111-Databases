@@ -126,6 +126,14 @@ def generate_success(rsp_str=None, msg=None):
 
     return Response(rsp_str, status=200, content_type="application/json")
 
+def generate_resource_not_found(msg=None):
+    if not msg:
+        msg = 'General resource not found'
+
+    rsp_str = json.dumps({'msg': msg})
+
+    return Response(rsp_str, status=404, content_type="application/json")
+
 def generate_invalid(ex=None, msg=None):
     if not msg:
         msg = 'General invalid request'
@@ -277,6 +285,10 @@ def resource_by_id(dbname, resource, primary_key):
             print(exception)
             return generate_error(ex=exception, msg='Fetch by primary key fails: ')
 
+        if not rsp_data:
+            msg = 'No entry with such primary key'
+            return generate_resource_not_found(msg=msg)
+
         # To accommodate for datetime format, set the default to string
         rsp_str = json.dumps(rsp_data, default=str)
 
@@ -311,14 +323,15 @@ def resource_by_id(dbname, resource, primary_key):
         if rsp_data == 0:
             is_data_found = rdb_data_table.find_by_primary_key(key_fields)
 
-            if is_data_found:
-                msg = 'The entry is found but the new values given are the same as old values'
+            if not is_data_found:
+                msg = 'No entry with such primary key'
+                return generate_resource_not_found(msg=msg)
             else:
-                msg = 'The entry is not found'
+                msg = 'The entry is found but the new values given are the same as old values'
         else:
             msg = 'The entry is succesfully updated'
 
-        return Response(msg, status=200, content_type="application/json")
+        return generate_success(msg=msg)
 
 @application.route('/api/<dbname>/<resource_name>', methods=['GET', 'POST'])
 def get_resource(dbname, resource_name):
