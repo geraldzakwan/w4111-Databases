@@ -286,7 +286,11 @@ def resource_by_id(dbname, resource, primary_key):
     # -- TO IMPLEMENT --
 
     # Get our rdb_data_table and at the same time cache it if it doesn't exist yet
-    rdb_data_table = dta.get_rdb_table(resource, dbname)
+    try:
+        rdb_data_table = dta.get_rdb_table(resource, dbname)
+    except Exception as exception:
+        print(exception)
+        return generate_error(ex=exception, msg='No such database or table: ')
 
     # Split by '_' to get all the key fields
     key_fields = primary_key.split('_')
@@ -367,7 +371,11 @@ def get_resource(dbname, resource_name):
     # -- TO IMPLEMENT --
 
     # Get our rdb_data_table and at the same time cache it if it doesn't exist yet
-    rdb_data_table = dta.get_rdb_table(resource_name, dbname)
+    try:
+        rdb_data_table = dta.get_rdb_table(resource_name, dbname)
+    except Exception as exception:
+        print(exception)
+        return generate_error(ex=exception, msg='No such database or table: ')
 
     if request.method == 'GET':
         #
