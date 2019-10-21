@@ -22,6 +22,8 @@ This README consists of three parts:
 
        - Explanations and assumptions about test scenarios are included in the unit test file as comments.
 
+       - Citation for get_primary_key_columns() function: https://stackoverflow.com/questions/2341278/how-to-get-primary-key-of-table
+
     c. I am not testing get_databases() and get_tables() functions implemented in data_table_adaptor.py
        because they are already tested when I test the API, i.e. when accessing
        /api/databases and /api/databases/<dbname> routes
