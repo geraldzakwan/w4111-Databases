@@ -123,7 +123,10 @@ def generate_success(rsp_str=None, msg=None):
     if not msg:
         msg = 'General resource modification succeeds'
 
-    rsp_str = json.dumps({'msg': msg})
+    rsp_str = json.dumps({
+        'status_code': 200,
+        'msg': msg
+    })
 
     return Response(rsp_str, status=200, content_type="application/json")
 
@@ -132,7 +135,10 @@ def generate_resource_not_found(msg=None):
     if not msg:
         msg = 'General resource not found'
 
-    rsp_str = json.dumps({'msg': msg})
+    rsp_str = json.dumps({
+        'status_code': 404,
+        'err_msg': msg
+    })
 
     return Response(rsp_str, status=404, content_type="application/json")
 
@@ -144,7 +150,10 @@ def generate_invalid(ex=None, msg=None):
     if not ex:
         ex = 'Unknown reason'
 
-    rsp_str = json.dumps({'err_msg': msg + str(ex)})
+    rsp_str = json.dumps({
+        'status_code': 400,
+        'err_msg': msg + str(ex)
+    })
 
     return Response(rsp_str, status=400, content_type="application/json")
 
@@ -165,7 +174,10 @@ def generate_error(ex=None, msg=None):
     if not ex:
         ex = 'Unknown reason'
 
-    rsp_str = json.dumps({'err_msg': msg + str(ex)})
+    rsp_str = json.dumps({
+        'status_code': 500,
+        'err_msg': msg + str(ex)
+    })
 
     return Response(rsp_str, status=500, content_type="application/json")
 
@@ -342,6 +354,9 @@ def resource_by_id(dbname, resource, primary_key):
 
         return generate_success(msg=msg)
 
+    else:
+        return generate_invalid()
+
 @application.route('/api/<dbname>/<resource_name>', methods=['GET', 'POST'])
 def get_resource(dbname, resource_name):
     context = log_and_extract_input(get_resource, (dbname, resource_name))
@@ -394,6 +409,7 @@ def get_resource(dbname, resource_name):
             return generate_error(ex=exception, msg='Insert fails: ')
 
         return generate_success(msg='Entry succesfully inserted')
+
     else:
         return generate_invalid()
 
