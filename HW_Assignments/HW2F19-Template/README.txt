@@ -93,4 +93,6 @@ This README consists of three parts:
                 'err_msg': 'Some error messages, depending on the case'
             }
 
-       The detail (case by case) is shown in the PDF file ->    test/api_test_result.pdf
+       The detail (case by case) is shown in the PDF file -> test/api_test_result.pdf
+
+    - I didn't do the extra credit
