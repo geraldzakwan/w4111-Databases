@@ -100,6 +100,10 @@ class RDBDataTable():
         self._table_name = table_name
         self._full_table_name = db_name + "." + table_name
 
+        # NOTE: I'm not sure whether get_primary_key_columns() and get_row_count() functions
+        # should return a value or set the object variable
+        # In this case, I decide to just return a value for both and use those values to set
+        # the _key_columns and _row_count variable in the class initialization below
         self._row_count = self.get_row_count()
         self._key_columns = self.get_primary_key_columns()
         self._sample_rows = self.get_sample_rows()
@@ -156,7 +160,7 @@ class RDBDataTable():
 
         if RDBDataTable.is_empty(data):
             print('Failed to fetch row counts')
-            return None
+            return 0
 
         # NOTE: I'm not sure whether this function should return a value or set the object variable
         # In this case, I decide to just return a value and use this value to set the _row_count variable in __int__
