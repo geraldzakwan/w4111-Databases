@@ -1,4 +1,5 @@
 /HW_Solutions
+*.zip*
 *.DS_Store
 *.coverage*
 .idea/w4111-Databases.iml
