@@ -1,5 +1,3 @@
-import pymysql
-import src.data_service.dbutils as dbutils
 import src.data_service.RDBDataTable as RDBDataTable
 
 # The REST application server app.py will be handling multiple requests over a long period of time.
