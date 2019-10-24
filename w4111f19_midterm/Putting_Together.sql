@@ -20,13 +20,17 @@ CREATE TABLE `salaries_clean` (
    `playerID` varchar(16),
    `salary` int unsigned,
    PRIMARY KEY (playerID, teamID, yearID, lgID),
-   -- FOREIGN KEY (playerID, teamID, yearID) REFERENCES Appearances(playerID, teamID, yearID)
+   -- FOREIGN KEY (playerID, teamID, yearID, lgID) REFERENCES Appearances(playerID, teamID, yearID, lgID)
    FOREIGN KEY (playerID) REFERENCES People(playerID),
-   FOREIGN KEY (teamID, yearID, lgID) REFERENCES Teams(teamID, yearID, lgID),
+   FOREIGN KEY (teamID, yearID) REFERENCES Teams(teamID, yearID)
+   -- FOREIGN KEY (teamID, yearID, lgID) REFERENCES Teams(teamID, yearID, lgID)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 INSERT INTO salaries_clean
 SELECT * FROM salaries;
+
+-- ALTER TABLE Teams 
+-- MODIFY lgID varchar(2);
 
 /* 
 SELECT playerID, teamID, yearID, salary FROM salaries WHERE NOT EXISTS (
