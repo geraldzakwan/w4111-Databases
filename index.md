@@ -115,6 +115,22 @@ notebook and/or PDF of a PowerPoint presentation.
 - Lecture 4: SQL Details
     - [HTML Format](Lectures/Lecture_4/w4111-L4-f2019-SQLDetails-REST.html)
     - [Jupyter Notebook Format](Lectures/Lecture_4/w4111-L4-f2019-SQLDetails-REST.ipynb)
+- Lecture 5: SQL Details (Continued), Data Modeling
+    - [HTML Format](Lectures/Lecture_5/w4111-L5-SQL-Details-DataModeling.html)
+    - [Jupyter Notebook Format](Lectures/Lecture_5/w4111-L5-SQL-Details-DataModeling.ipynb)
+- Lecture 6: Data Modeling, Data Patterns, Midterm Review
+    - [HTML Format](Lectures/Lecture_6/w4111-L6-AdvancedSQL-DataModeling-Midterm.html)
+    - [Jupyter Notebook Format](Lectures/Lecture_6/w4111-L6-AdvancedSQL-DataModeling-Midterm.ipynb)
+- Lecture 7: Module II Begins, DBMS Implementation Overview (Note: Material is lecture slides)
+    - [DBMS Implementation Overview](Lectures/Lecture_7/ch_1_modified.pdf)
+    - [Storge Management, Hierarchy, Disks](Lectures/Lecture_7/ch12.pdf)
+- Lecture 8: 
+    - [Data Storage/Disks](Lectures/Lecture_8/ch13.pdf)
+    - [Indexes](Lectures/Lecture_8/ch14.pdf)
+    - [Query Processing](Lectures/Lecture_8/ch15.pdf)
+    - [Query Optimization](Lectures/Lecture_8/ch16.pdf)
+- Lecture 9:
+    - [Query Processing and Transactions](Lectures/Lecture_9/Module_II__query_processing_transactions_recovery_v2.pdf)
 - Makeup Lectures:
     - Jupyter Notebooks:
         - [Part 1](Lectures/Makeup_Lectures/w4111-Makeup-F2019-RelationalModelREST-Part-1.ipynb)
@@ -122,3 +138,5 @@ notebook and/or PDF of a PowerPoint presentation.
     - HTML:
         - [Part 1](Lectures/Makeup_Lectures/w4111-Makeup-F2019-RelationalModelREST-Part-1.html)
         - [Part 2](Lectures/Makeup_Lectures/w4111-Makeup-F2019-RelationalModelREST-Part-2.html)
+- 15_Nov_Makeup_No_SQL:
+    - [Slides](Lectures/Makeup_Lecture_15_Nov/no_sql_2b.pdf)
